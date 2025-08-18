@@ -671,7 +671,7 @@ function labredes_customizacao(){
         sudo chmod 555 $shortcut
         sudo chown aluno:aluno $shortcut
 
-        cp $shortcut /home/aluno/Desktop/.
+        sudo cp $shortcut /home/aluno/Desktop/.
 
     done
 
