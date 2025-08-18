@@ -14,8 +14,6 @@ function labredes_install_apps_Internet(){
     install_dir="`pwd`"
     log="${install_dir}"/installation.log
 
-    > ${log}
-
     distro="$1"
     version="$2"
 
@@ -551,6 +549,10 @@ function labredes_customizacao(){
         return 1;
     fi
 
+    install_dir="`pwd`"
+
+    log="${install_dir}/installation.log"
+
     distro="$1"
     version="$2"
 
@@ -572,27 +574,51 @@ function labredes_customizacao(){
         ;;
     esac
 
-    return 0;
-
-    install_dir="`pwd`"
-
     ### Adicionando usuario 'aluno' ###
-    echo "cefet" > senha.txt
+    id aluno > /dev/null
+    if [[ $? -ne 0 ]]; then
+        echo "Adicionando 'aluno' com senha 'cefet' ..."
+    
+        echo "cefet" > senha.txt
+        echo "cefet" >> senha.txt
 
-    adduser --gecos=",,,," aluno < senha.txt
+        sudo adduser --gecos=",,," aluno < senha.txt
+        rm senha.txt
+
+    else
+        echo "Usuario 'aluno' jah adicionado"
+    fi
 
     ### Customizacao: colocando 'aluno' no grupo 'dialup' para usar o Arduino ###
-
-    sudo usermod -aG dialout aluno
+    # Grupos complementares: plugdev (pendive), cdrom, lpadmin (impressoras)
+    sudo usermod -aG dialout,plugdev,cdrom,users,lpadmin aluno    
 
     ### Customizacao: autologin ###
-    cp /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf-`date +"%Y-%m-%d_%H-%M"`.backup
 
-    sed 's/#autologin-user=/autologin-user=aluno/g' /etc/lightdm/lightdm.conf | sudo tee /tmp/lightdm.conf
-    sudo mv /tmp/lightdm.conf /etc/lightdm/lightdm.conf
+    if [[ ! -f ${install_dir}/.autologin-ok.stamp ]]; then 
+        case $distro in)
+            debian|zorin)
+                # Supondo utilizacao do ambiente LXDE
+                cp /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf-`date +"%Y-%m-%d_%H-%M"`.backup
 
-    sed 's/#autologin-user-timeout=0/autologin-user-timeout=0/g' /etc/lightdm/lightdm.conf | sudo tee /tmp/lightdm.conf
-    sudo mv /tmp/lightdm.conf /etc/lightdm/lightdm.conf
+                sed 's/#autologin-user=/autologin-user=aluno/g' /etc/lightdm/lightdm.conf | sudo tee /tmp/lightdm.conf
+                sudo mv /tmp/lightdm.conf /etc/lightdm/lightdm.conf
+
+                sed 's/#autologin-user-timeout=0/autologin-user-timeout=0/g' /etc/lightdm/lightdm.conf | sudo tee /tmp/lightdm.conf
+                sudo mv /tmp/lightdm.conf /etc/lightdm/lightdm.conf
+
+                touch ${install_dir}/.autologin-ok.stamp
+                echo "[`date`] Autologin configured" | tee -a ${log}
+                ;;
+            *)
+                echo "[`date`] ERROR! Unsupported autologin distro!" | tee -a ${log}
+                ;;
+        esac;
+    else
+        echo "[`date`] Autologin already configured" | tee -a ${log}
+    fi
+
+    return 0;
 
     ### Customizacao: Senha de root do MySQL ###
 
