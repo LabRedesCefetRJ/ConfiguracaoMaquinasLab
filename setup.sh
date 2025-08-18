@@ -12,7 +12,29 @@ packages="packages"
 function labredes_install_apps_Internet(){
 
     install_dir="`pwd`"
-    error_log="${install_dir}"/errors.log
+    log="${install_dir}"/installation.log
+
+    distro="$1"
+    version="$2"
+
+    case $distro in
+
+        debian)
+            echo "Distribution: Debian"
+        ;;
+
+        zorin)
+            version="`lsb_release -r | grep "Release" | grep -o -E '[[:digit:]]+'`"
+            echo "Distribution: Zorin"
+            echo "Version: $version"
+        ;;
+
+        *)
+            echo "Error: distribution not selected!"
+            echo "Select between: debian, zorin"
+            return -1
+        ;;
+    esac    
 
     if [[ ! -f packages ]]; then 
 
@@ -22,7 +44,12 @@ function labredes_install_apps_Internet(){
 
     fi
 
-    alias sudo="";
+    which sudo
+    if [[ $? -ne 0 ]]; then
+
+        alias sudo=""
+
+    fi
 
     [[ ! -d DEBS ]] && mkdir DEBS
 
@@ -36,9 +63,11 @@ function labredes_install_apps_Internet(){
         sudo apt update
         sudo apt-get -y full-upgrade
 
-        sudo touch "${install_dir}/.full-upgrade.stamp"
+        touch "${install_dir}/.full-upgrade.stamp"
 
         clear
+
+        echo "[`date`] Full upgrade finished" | tee -a ${log}
 
         echo "O computador será reiniciado em 10s"
         echo
@@ -47,79 +76,175 @@ function labredes_install_apps_Internet(){
         sleep 10
 
         sudo reboot
-
+    else
+        echo "[`date`] Full upgrade already done" | tee -a ${log}
     fi
 
-    sudo apt-get -y install wget gpg git
+    ##############
+    ### MySQL ###
+    #############
 
-    ###############################
-    ### MySQL & MySQL Workbench ###
-    ###############################
+    if [[ "$distro" == "debian" ]]; then 
 
-    # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
+        # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
 
-    echo "\
+        echo "\
 deb http://ftp.br.debian.org/debian bookworm          main contrib non-free non-free-firmware 
 deb http://ftp.br.debian.org/debian bookworm-updates  main contrib non-free non-free-firmware 
 deb http://security.debian.org      bookworm-security  main contrib non-free
 
 deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list
 
-    echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
+        echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
 
+    fi
 
     ##############
     ### ChonOS ###
     ##############
 
-    echo "deb [trusted=yes] http://packages.chon.group/ chonos main" | sudo tee /etc/apt/sources.list.d/chonos.list
+    if [[ ! -f "${install_dir}/.chonos-repo.stamp" ]]; then 
+        echo "deb [trusted=yes] http://packages.chon.group/ chonos main" | sudo tee /etc/apt/sources.list.d/chonos.list
+
+        echo "[`date`] ChonOS repository added" | tee -a ${log}
+        touch "${install_dir}/.chonos-repo.stamp"
+    else 
+        echo "[`date`] ChonOS repository already added" | tee -a ${log}
+    fi
 
     ##########################
     ### Visual Studio Code ###
     ##########################
 
-    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-    sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
-    sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | tee /etc/apt/sources.list.d/vscode.list'
-    rm -f packages.microsoft.gpg
+    if [[ ! -f "${install_dir}/.vscode-repo.stamp" ]]; then 
+
+        wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+        sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+        sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | tee /etc/apt/sources.list.d/vscode.list'
+        rm -f packages.microsoft.gpg
+
+        echo "[`date`] VSCode repository added" | tee -a ${log}
+        touch "${install_dir}/.vscode-repo.stamp"
+    else 
+        echo "[`date`] VSCode repository already added" | tee -a ${log}
+    fi    
 
     ##############    
     ### WeBOTS ###
     ##############    
 
-    echo "Configuring new repositories in the package manager"
-    sudo mkdir -p /etc/apt/keyrings
-    cd /etc/apt/keyrings
-    sudo wget -q https://cyberbotics.com/Cyberbotics.asc
-    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/Cyberbotics.asc] https://cyberbotics.com/debian binary-amd64/" | sudo tee /etc/apt/sources.list.d/Cyberbotics.list
+    if [[ ! -f "${install_dir}/.webots-repo.stamp" ]]; then 
 
+        echo "Configuring new repositories in the package manager"
+        sudo mkdir -p /etc/apt/keyrings
+        cd /etc/apt/keyrings
+        sudo wget -q https://cyberbotics.com/Cyberbotics.asc
+        echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/Cyberbotics.asc] https://cyberbotics.com/debian binary-amd64/" | sudo tee /etc/apt/sources.list.d/Cyberbotics.list
+
+        echo "[`date`] WeBOTS repository added" | tee -a ${log}
+        touch "${install_dir}/.webots-repo.stamp"
+    else 
+        echo "[`date`] WeBOTS repository already added" | tee -a ${log}
+    fi        
 
     sudo apt update
+    if [[ $? -ne 0 ]]; then
+        echo "[`date`] ERROR during apt update!" | tee -a ${log}
+    fi
 
     ################################################
     ### Instalação dos pacotes via repositorios. ###
     ################################################
 
-    cd "${install_dir}"
-    echo "Starting packages installation on ${install_dir} ..."
+    if [[ ! -f "${install_dir}/.apt-install.stamp"  ]]; then
 
-    ok_pkgs=`mktemp`
-    
-    for pkg in $(cat "$packages"); do
-        echo -n "Checando $pkg ...";
-        apt-get install -q -s -y $pkg > /dev/null
-        if [[ $? -eq 0 ]]; then 
-            echo "ok";
-            echo "$pkg" >> $ok_pkgs ;
+        cd "${install_dir}"
+        echo "Starting packages installation on ${install_dir} ..."
 
+        ok_pkgs=`mktemp`
+        
+        for pkg in $(cat "$packages"); do
+            echo -n "Checando $pkg ...";
+            apt-get install -q -s -y $pkg > /dev/null
+            if [[ $? -eq 0 ]]; then 
+                echo "ok";
+                echo "$pkg" >> $ok_pkgs ;
+
+            else 
+                echo "ERROR";
+                echo "Package not installed: $pkg" >> ${log} ;
+            fi
+        done
+
+        sudo apt install linux-headers-`uname -r`
+        sudo apt-get install -y `cat $ok_pkgs`
+
+        if [[ $? -eq 0 ]]; then
+            echo "[`date`] Packages from APT installed" | tee -a ${log}
+            touch "${install_dir}/.apt-install.stamp"
         else 
-            echo "ERROR";
-            echo "Package not installed: $pkg" >> ${error_log} ;
+            echo "[`date`] ERROR installing packages from APT! " | tee -a ${log}
         fi
-    done
 
-    sudo apt install linux-headers-`uname -r`
-    sudo apt-get install -y `cat $ok_pkgs`
+    else 
+        echo "[`date`] Packages from APT already installed" | tee -a ${log}
+    fi
+
+    #######################
+    ### MySQL Workbench ###
+    #######################
+
+    cd "${install_dir}/DEBS"
+
+    if [[ ! -f "${install_dir}/.workbench-installed.stamp" ]]; then
+
+        if [[ "$distro" == "debian" ]]; then 
+
+            # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
+
+            echo "\
+deb http://ftp.br.debian.org/debian bookworm          main contrib non-free non-free-firmware 
+deb http://ftp.br.debian.org/debian bookworm-updates  main contrib non-free non-free-firmware 
+deb http://security.debian.org      bookworm-security  main contrib non-free
+
+deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list
+
+echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
+
+        fi
+
+        # O Zorin jah possui o MySQL mas nao o Workbench
+        if [[ "$distro" == "zorin" ]]; then 
+
+            case $version in
+                17)
+                    echo "Installing MySQL workbench for Zorin/$version ..."
+
+                    workbench_deb="mysql-workbench-community_8.0.43-1ubuntu22.04_amd64.deb"
+
+                    if [[ ! -f $workbench_deb ]]; then 
+                        wget "https://cdn.mysql.com//Downloads/MySQLGUITools/$workbench_deb"
+                    fi
+
+                    sudo apt install -y ./mysql-workbench-community_8.0.43-1ubuntu22.04_amd64.deb
+                    sudo apt install -y -f 
+
+                    if [[ $? -eq 0 ]]; then                    
+                        echo "[`date`] Installation of MySQL Workbench for Zorin/${version} finished" | tee -a ${log}
+                        touch "${install_dir}/.workbench-installed.stamp"
+                    else 
+                        echo "[`date`] ERROR installing MySQL Workbench for Zorin ${version}! " | tee -a ${log}
+                    fi
+                    ;;
+                *)
+                    echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro} ${version}!" | tee -a ${log}
+                    ;;
+            esac;
+        fi
+
+    else
+        echo "[`date`] MySQL Workbench already installed" | tee -a ${log}
+    fi
 
     #####################
     ### Google Chrome ###
@@ -127,53 +252,127 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
     cd "${install_dir}/DEBS"
 
-    GOOGLE_CHROME_DEB=google-chrome-stable_current_amd64.deb
+    if [[ ! -f "${install_dir}/.google-chrome.stamp" ]]; then 
 
-    if [[ ! -f ${GOOGLE_CHROME_DEB} ]]; then
+        GOOGLE_CHROME_DEB=google-chrome-stable_current_amd64.deb
 
-        wget https://dl.google.com/linux/direct/${GOOGLE_CHROME_DEB}
-        sudo apt install -y ./google-chrome-stable_current_amd64.deb
-        sudo apt install -y -f
-    fi
+        if [[ ! -f ${GOOGLE_CHROME_DEB} ]]; then
+
+            wget https://dl.google.com/linux/direct/${GOOGLE_CHROME_DEB}
+            sudo apt install -y ./google-chrome-stable_current_amd64.deb
+            sudo apt install -y -f
+
+            if [[ $? -eq 0 ]]; then
+                echo "[`date`] Installation of Google Chrome finished" | tee -a ${log}
+                touch "${install_dir}/.google-chrome.stamp"
+            else 
+                echo "[`date`] ERROR installing Google Chrome for ${distro}/${version}! " | tee -a ${log}
+            fi
+
+        fi    
+
+    else    
+        echo "[`date`] Google Chrome already installed " | tee -a ${log}
+    fi    
 
     ###############
     ### PyCharm ###
     ###############
 
-    PYCHARM_VERSION="pycharm-community-2023.3.3"
-    PYCHARM_TGZ="${PYCHARM_VERSION}.tar.gz"
+    if [[ ! -f "${install_dir}/.pycharm-installed.stamp" ]]; then
+        
+        if [[ "$distro" == "zorin" ]]; then
 
-    cd "${install_dir}/DEBS"
-    
-    wget "https://download.jetbrains.com/python/${PYCHARM_TGZ}"
+            # Zorin has installation on flathub
+            flatpak -y install PyCharm-Community
 
-    if [[ $? -eq 0 ]]; then 
+            if [[ $? -eq 0 ]]; then
+                echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
+                touch "${install_dir}/.pycharm-installed.stamp"
+            else 
+                echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
+            fi           
 
-        tar xaf "${PYCHARM_TGZ}"
+        else 
+            # legacy installation
 
-        chown -R aluno:aluno ${PYCHARM_VERSION}
-        chmod a+x ${PYCHARM_VERSION}/bin/pycharm.sh
+            cd "${install_dir}/DEBS"
 
-        mv ${PYCHARM_VERSION} /home/aluno/.local/.
+            PYCHARM_VERSION="pycharm-community-2025.2.0.1"
+            PYCHARM_TGZ="${PYCHARM_VERSION}.tar.gz"
 
-        if [[ ! -d /home/aluno/.local ]]; then 
-            
-            mkdir /home/aluno/.local
-            sudo chown aluno:aluno /home/aluno/.local
-            
+            if [[ ! -f "${PYCHARM_TGZ}" ]]; then
+                wget "https://download.jetbrains.com/python/${PYCHARM_TGZ}"
+            fi
+
+            if [[ -f "${PYCHARM_TGZ}" ]]; then
+
+                sudo tar xzf pycharm-*.tar.gz -C /opt/
+
+                cd /opt/pycharm-*/bin
+
+                sh pycharm.sh
+
+                if [[ $? -eq 0 ]]; then
+                    echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
+                    touch "${install_dir}/.pycharm-installed.stamp"
+                else 
+                    echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
+                fi         
+
+            else
+                echo "[`date`] ERROR! Couldn't download PyCharm!" | tee -a ${log}             
+            fi
+
+            if [[ 1 -eq 0 ]]; then 
+                chown -R aluno:aluno ${PYCHARM_VERSION}
+                chmod a+x ${PYCHARM_VERSION}/bin/pycharm.sh
+
+                mv ${PYCHARM_VERSION} /home/aluno/.local/.
+
+                if [[ ! -d /home/aluno/.local ]]; then 
+                    
+                    mkdir /home/aluno/.local
+                    sudo chown aluno:aluno /home/aluno/.local
+                    
+                fi
+                echo "export PATH=\"/home/aluno/.local/${PYCHARM_VERSION}/bin:\${PATH}\"" | sudo tee -a /home/aluno/.profile
+
+                cd /home/aluno/Desktop
+
+                ln -s /home/aluno/.local/${PYCHARM_VERSION}/bin/pycharm.sh
+            fi
         fi
-
-        echo "export PATH=\"/home/aluno/.local/${PYCHARM_VERSION}/bin:\${PATH}\"" | sudo tee -a /home/aluno/.profile
-
-        cd /home/aluno/Desktop
-
-        ln -s /home/aluno/.local/${PYCHARM_VERSION}/bin/pycharm.sh
 
     else 
 
-        echo "Erro! Não foi possível baixar o PyCharm!" | sudo tee -a ${error_log}
+        echo "[`date`] PyCharm already installed" | tee -a ${log}
 
     fi
+
+    ################
+    ### Eclipse  ###
+    ################
+
+    if [[ ! -f "${install_dir}/.eclipse-installed.stamp" ]]; then
+        
+        if [[ "$distro" == "zorin" ]]; then
+
+            # Zorin has installation on flathub
+            flatpak -y install org.eclipse.Java
+
+            if [[ $? -eq 0 ]]; then
+                echo "[`date`] Installation of Eclipse for Java finished" | tee -a ${log}
+                touch "${install_dir}/.eclipse-installed.stamp"
+            else 
+                echo "[`date`] ERROR installing Eclipse for Java for ${distro}/${version}! " | tee -a ${log}
+            fi
+        else 
+            echo "[`date`] ERROR: can't install Eclipse!" | tee -a ${log}
+        fi
+    else 
+        echo "[`date`] Eclipse already installed" | tee -a ${log}
+    fi    
 
     #####################
     ### Packet Tracer ###
@@ -184,29 +383,37 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
     cd "${install_dir}/DEBS"
 
-    wget "http://bsi.cefet-rj.br/repo/~debian/debs/packet_tracer.deb" \
-        -O packettracer.deb
+    if [[ ! -f "${install_dir}/.packet-tracer-installed.stamp" ]]; then
 
-
-    if [[ $? -eq 0 ]]; then 
+        wget "http://bsi.cefet-rj.br/repo/~debian/debs/packettracer.deb" \
+            -O packettracer.deb
 
         sudo apt install -y ./packettracer.deb
 
-    else 
-
-        echo "ERROR"
-        echo "Erro! Não foi possível baixar o Packet Tracer!" | sudo tee -a ${error_log}
-
+        if [[ $? -eq 0 ]]; then
+            echo "[`date`] Installation of Packet Tracer finished" | tee -a ${log}
+            touch "${install_dir}/.packet-tracer-installed.stamp"
+        else 
+            echo "[`date`] ERROR installing Packet Tracer for ${distro}/${version}! " | tee -a ${log}
+        fi
+    else
+        echo "[`date`] Packet Tracer already installed"
     fi
+
+    return 0;
 
     #################
     ### Wireshark ###
     #################
 
-    # No Debian 12 sid ele está com a instalação quebrada, portanto pegando a versão do repositório bookworm
-    # Se isso mudar ou parar de funcionar, logo abaixo está como compilar o programa na unha
+    if [[ "$distro" == "debian" ]]; then 
 
-    sudo apt install -t bookworm -y wireshark
+        # No Debian 12 sid ele está com a instalação quebrada, portanto pegando a versão do repositório bookworm
+        # Se isso mudar ou parar de funcionar, logo abaixo está como compilar o programa na unha
+
+        sudo apt install -t bookworm -y wireshark
+
+    fi
 
     #sudo apt install -y libpcap-dev libglib2.0-dev flex asciidoctor qt6-base-dev cmake libgcrypt20-dev libc-ares-dev qt6-tools-dev libqt6core5compat6-dev libspeexdsp-dev
 
@@ -344,18 +551,74 @@ function labredes_customizacao(){
 
     install_dir="`pwd`"
 
-    ### Customizacao: colocando 'aluno' no grupo 'dialup' para usar o Arduino ###
+    log="${install_dir}/installation.log"
 
-    sudo usermod -aG dialout aluno
+    distro="$1"
+    version="$2"
+
+    case $distro in
+
+        debian)
+            echo "Distribution: Debian"
+
+        ;;
+
+        zorin)
+            echo "Distribution: Zorin"
+        ;;
+
+        *)
+            echo "Error: distribution not selected!"
+            echo "Select between: debian, zorin"
+            return -1
+        ;;
+    esac
+
+    ### Adicionando usuario 'aluno' ###
+    id aluno > /dev/null
+    if [[ $? -ne 0 ]]; then
+        echo "Adicionando 'aluno' com senha 'cefet' ..."
+    
+        echo "cefet" > senha.txt
+        echo "cefet" >> senha.txt
+
+        sudo adduser --gecos=",,," aluno < senha.txt
+        rm senha.txt
+
+    else
+        echo "Usuario 'aluno' jah adicionado"
+    fi
+
+    ### Customizacao: colocando 'aluno' no grupo 'dialup' para usar o Arduino ###
+    # Grupos complementares: plugdev (pendive), cdrom, lpadmin (impressoras)
+    sudo usermod -aG dialout,plugdev,cdrom,users,lpadmin aluno    
 
     ### Customizacao: autologin ###
-    cp /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf-`date +"%Y-%m-%d_%H-%M"`.backup
 
-    sed 's/#autologin-user=/autologin-user=aluno/g' /etc/lightdm/lightdm.conf | sudo tee /tmp/lightdm.conf
-    sudo mv /tmp/lightdm.conf /etc/lightdm/lightdm.conf
+    if [[ ! -f ${install_dir}/.autologin-ok.stamp ]]; then 
+        case $distro in)
+            debian|zorin)
+                # Supondo utilizacao do ambiente LXDE
+                cp /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf-`date +"%Y-%m-%d_%H-%M"`.backup
 
-    sed 's/#autologin-user-timeout=0/autologin-user-timeout=0/g' /etc/lightdm/lightdm.conf | sudo tee /tmp/lightdm.conf
-    sudo mv /tmp/lightdm.conf /etc/lightdm/lightdm.conf
+                sed 's/#autologin-user=/autologin-user=aluno/g' /etc/lightdm/lightdm.conf | sudo tee /tmp/lightdm.conf
+                sudo mv /tmp/lightdm.conf /etc/lightdm/lightdm.conf
+
+                sed 's/#autologin-user-timeout=0/autologin-user-timeout=0/g' /etc/lightdm/lightdm.conf | sudo tee /tmp/lightdm.conf
+                sudo mv /tmp/lightdm.conf /etc/lightdm/lightdm.conf
+
+                touch ${install_dir}/.autologin-ok.stamp
+                echo "[`date`] Autologin configured" | tee -a ${log}
+                ;;
+            *)
+                echo "[`date`] ERROR! Unsupported autologin distro!" | tee -a ${log}
+                ;;
+        esac;
+    else
+        echo "[`date`] Autologin already configured" | tee -a ${log}
+    fi
+
+    return 0;
 
     ### Customizacao: Senha de root do MySQL ###
 
