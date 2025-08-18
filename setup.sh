@@ -12,7 +12,7 @@ packages="packages"
 function labredes_install_apps_Internet(){
 
     install_dir="`pwd`"
-    error_log="${install_dir}"/errors.log
+    log="${install_dir}"/installation.log
 
     distro="$1"
     version="$2"
@@ -75,7 +75,7 @@ function labredes_install_apps_Internet(){
 
         sudo reboot
     else
-        echo "Full upgrade jah feito" | tee -a ${error_log}
+        echo "Full upgrade jah feito" | tee -a ${log}
     fi
 
 
@@ -146,7 +146,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
             else 
                 echo "ERROR";
-                echo "Package not installed: $pkg" >> ${error_log} ;
+                echo "Package not installed: $pkg" >> ${log} ;
             fi
         done
 
@@ -156,7 +156,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
         if [[ $? -eq 0 ]]; then
             touch "${install_dir}/.apt-install.stamp"
         else 
-            echo "ERROR installing packages from APT! " | tee -a ${error_log}
+            echo "ERROR installing packages from APT! " | tee -a ${log}
         fi
 
     else 
@@ -197,16 +197,17 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
                 sudo apt install -y -f 
 
                 if [[ $? -eq 0 ]]; then
+                    echo "Installation of MySQL Workbench finished" | tee -a ${log}
                     touch "${install_dir}/.workbench-installed.stamp"
                 else 
-                    echo "ERROR installing MySQL Workbench for Zorin ${version}! " | tee -a ${error_log}
+                    echo "ERROR installing MySQL Workbench for Zorin ${version}! " | tee -a ${log}
                 fi                
             fi 
         fi
 
     else
 
-        echo "MySQL Workbench already installed" | tee -a ${error_log}
+        echo "MySQL Workbench already installed" | tee -a ${log}
 
     fi
 
@@ -229,15 +230,16 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
             sudo apt install -y -f
 
             if [[ $? -eq 0 ]]; then
+                echo "Installation of Google Chrome finished" | tee -a ${log}
                 touch "${install_dir}/.google-chrome.stamp"
             else 
-                echo "ERROR installing Google Chrome for ${distro}/${version}! " | tee -a ${error_log}
+                echo "ERROR installing Google Chrome for ${distro}/${version}! " | tee -a ${log}
             fi 
 
         fi    
 
     else    
-        echo "Google Chrome already installed " | tee -a ${error_log}
+        echo "Google Chrome already installed " | tee -a ${log}
     fi    
 
     ###############
@@ -275,7 +277,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
     else 
 
-        echo "Erro! Não foi possível baixar o PyCharm!" | sudo tee -a ${error_log}
+        echo "Erro! Não foi possível baixar o PyCharm!" | sudo tee -a ${log}
 
     fi
 
@@ -299,7 +301,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
     else 
 
         echo "ERROR"
-        echo "Erro! Não foi possível baixar o Packet Tracer!" | sudo tee -a ${error_log}
+        echo "Erro! Não foi possível baixar o Packet Tracer!" | sudo tee -a ${log}
 
     fi
 
