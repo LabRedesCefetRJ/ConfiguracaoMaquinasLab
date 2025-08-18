@@ -71,7 +71,9 @@ function labredes_install_apps_Internet(){
             echo "Select between: debian, zorin"
             return -1
         ;;
-    esac    
+    esac
+
+    sudo su
 
     ###############################
     ### MySQL & MySQL Workbench ###
