@@ -667,8 +667,11 @@ function labredes_customizacao(){
         echo "Setting $shortcut ... "
 
         sudo chown aluno:aluno $shortcut
+        
+        sudo gio set $shortcut metadata::trusted true
+        sudo gio set $shortcut metadata::trusted yes
+
         sudo chmod 555 $shortcut
-        sudo -u aluno gio set $shortcut metadata::trusted true
 
     done
 
