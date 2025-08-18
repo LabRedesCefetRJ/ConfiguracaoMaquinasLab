@@ -69,6 +69,8 @@ function labredes_install_apps_Internet(){
 
         clear
 
+        echo "[`date`] Full upgrade finished" | tee -a ${log}
+
         echo "O computador será reiniciado em 10s"
         echo
         echo "Certifique-se de fazer um login no usuário 'aluno' a fim de serem criadas as pastas e arquivos do usuário"
@@ -79,7 +81,6 @@ function labredes_install_apps_Internet(){
     else
         echo "[`date`] Full upgrade already done" | tee -a ${log}
     fi
-
 
     ##############
     ### MySQL ###
@@ -244,9 +245,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
         fi
 
     else
-
         echo "[`date`] MySQL Workbench already installed" | tee -a ${log}
-
     fi
 
     #####################
@@ -286,8 +285,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
         
         if [[ "$distro" == "zorin" ]]; then
 
-            # zorin has installation on flathub
-
+            # Zorin has installation on flathub
             flatpak -y install PyCharm-Community
 
             if [[ $? -eq 0 ]]; then
@@ -362,8 +360,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
         
         if [[ "$distro" == "zorin" ]]; then
 
-            # zorin has installation on flathub
-
+            # Zorin has installation on flathub
             flatpak -y install org.eclipse.Java
 
             if [[ $? -eq 0 ]]; then
@@ -372,6 +369,8 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
             else 
                 echo "[`date`] ERROR installing Eclipse for Java for ${distro}/${version}! " | tee -a ${log}
             fi
+        else 
+            echo "[`date`] ERROR: can't install Eclipse!" | tee -a ${log}
         fi
     else 
         echo "[`date`] Eclipse already installed" | tee -a ${log}
