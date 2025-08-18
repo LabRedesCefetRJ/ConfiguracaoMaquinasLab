@@ -75,11 +75,11 @@ function labredes_install_apps_Internet(){
 
         sudo reboot
     else
-        echo "Full upgrade jah feito" | tee -a ${log}
+        echo "[`date`] Full upgrade jah feito" | tee -a ${log}
     fi
 
 
-   ##############
+    ##############
     ### MySQL ###
     #############
 
@@ -102,29 +102,55 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
     ### ChonOS ###
     ##############
 
-    echo "deb [trusted=yes] http://packages.chon.group/ chonos main" | sudo tee /etc/apt/sources.list.d/chonos.list
+    if [[ ! -f "${install_dir}/.chonos-repo.stamp" ]]; then 
+        echo "deb [trusted=yes] http://packages.chon.group/ chonos main" | sudo tee /etc/apt/sources.list.d/chonos.list
+
+        echo "[`date`] ChonOS repository added" | tee -a ${log}
+        touch "${install_dir}/.chonos-repo.stamp"
+    else 
+        echo "[`date`] ChonOS repository already added" | tee -a ${log}
+    fi
 
     ##########################
     ### Visual Studio Code ###
     ##########################
 
-    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-    sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
-    sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | tee /etc/apt/sources.list.d/vscode.list'
-    rm -f packages.microsoft.gpg
+    if [[ ! -f "${install_dir}/.vscode-repo.stamp" ]]; then 
+
+        wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+        sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+        sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | tee /etc/apt/sources.list.d/vscode.list'
+        rm -f packages.microsoft.gpg
+
+        echo "[`date`] VSCode repository added" | tee -a ${log}
+        touch "${install_dir}/.vscode-repo.stamp"
+    else 
+        echo "[`date`] VSCode repository already added" | tee -a ${log}
+    fi    
 
     ##############    
     ### WeBOTS ###
     ##############    
 
-    echo "Configuring new repositories in the package manager"
-    sudo mkdir -p /etc/apt/keyrings
-    cd /etc/apt/keyrings
-    sudo wget -q https://cyberbotics.com/Cyberbotics.asc
-    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/Cyberbotics.asc] https://cyberbotics.com/debian binary-amd64/" | sudo tee /etc/apt/sources.list.d/Cyberbotics.list
+    if [[ ! -f "${install_dir}/.webots-repo.stamp" ]]; then 
 
+        echo "Configuring new repositories in the package manager"
+        sudo mkdir -p /etc/apt/keyrings
+        cd /etc/apt/keyrings
+        sudo wget -q https://cyberbotics.com/Cyberbotics.asc
+        echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/Cyberbotics.asc] https://cyberbotics.com/debian binary-amd64/" | sudo tee /etc/apt/sources.list.d/Cyberbotics.list
+
+        echo "[`date`] WeBOTS repository added" | tee -a ${log}
+        touch "${install_dir}/.webots-repo.stamp"
+    else 
+        echo "[`date`] WeBOTS repository already added" | tee -a ${log}
+    fi        
 
     sudo apt update
+    if [[ $? -ne 0 ]]; then
+        echo "[`date`] ERROR during apt update!"
+        return 1
+    fi
 
     ################################################
     ### Instalação dos pacotes via repositorios. ###
@@ -154,9 +180,10 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
         sudo apt-get install -y `cat $ok_pkgs`
 
         if [[ $? -eq 0 ]]; then
+            echo "[`date`] Packages from APT installed" | tee -a ${log}
             touch "${install_dir}/.apt-install.stamp"
         else 
-            echo "ERROR installing packages from APT! " | tee -a ${log}
+            echo "[`date`] ERROR installing packages from APT! " | tee -a ${log}
         fi
 
     else 
@@ -197,10 +224,10 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
                 sudo apt install -y -f 
 
                 if [[ $? -eq 0 ]]; then
-                    echo "Installation of MySQL Workbench finished" | tee -a ${log}
+                    echo "[`date`] Installation of MySQL Workbench finished" | tee -a ${log}
                     touch "${install_dir}/.workbench-installed.stamp"
                 else 
-                    echo "ERROR installing MySQL Workbench for Zorin ${version}! " | tee -a ${log}
+                    echo "[`date`] ERROR installing MySQL Workbench for Zorin ${version}! " | tee -a ${log}
                 fi                
             fi 
         fi
@@ -230,10 +257,10 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
             sudo apt install -y -f
 
             if [[ $? -eq 0 ]]; then
-                echo "Installation of Google Chrome finished" | tee -a ${log}
+                echo "[`date`] Installation of Google Chrome finished" | tee -a ${log}
                 touch "${install_dir}/.google-chrome.stamp"
             else 
-                echo "ERROR installing Google Chrome for ${distro}/${version}! " | tee -a ${log}
+                echo "[`date`] ERROR installing Google Chrome for ${distro}/${version}! " | tee -a ${log}
             fi 
 
         fi    
