@@ -374,7 +374,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
             fi
         fi
     else 
-        echo "[`date`] Eclipse already installe " | tee -a ${log}
+        echo "[`date`] Eclipse already installed" | tee -a ${log}
     fi
 
     return 0;
