@@ -597,7 +597,7 @@ function labredes_customizacao(){
 
     if [[ ! -f ${install_dir}/.autologin-ok.stamp ]]; then 
         case $distro in
-            debian|zorin)
+            debian)
                 # Supondo utilizacao do ambiente LXDE
                 cp /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf-`date +"%Y-%m-%d_%H-%M"`.backup
 
@@ -609,6 +609,13 @@ function labredes_customizacao(){
 
                 touch ${install_dir}/.autologin-ok.stamp
                 echo "[`date`] Autologin configured" | tee -a ${log}
+                ;;
+            zorin)
+                cp /etc/gdm3/custom.conf /etc/gdm3/custom.conf-`date +"%Y-%m-%d_%H-%M"`.backup
+
+                sed 's/#.*AutomaticLoginEnable.*/   AutomaticLoginEnable = true/g' /etc/gdm3/custom.conf | sudo tee /tmp/custom.conf
+                sudo mv /tmp/custom.conf /etc/gdm3/custom.conf                
+
                 ;;
             *)
                 echo "[`date`] ERROR! Unsupported autologin distro!" | tee -a ${log}
