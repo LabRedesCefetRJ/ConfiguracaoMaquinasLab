@@ -215,8 +215,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
         # O Zorin jah possui o MySQL mas nao o Workbench
         if [[ "$distro" == "zorin" ]]; then 
 
-            case $version in)
-
+            case $version in
                 17)
                     echo "Installing MySQL workbench for Zorin/$version ..."
 
