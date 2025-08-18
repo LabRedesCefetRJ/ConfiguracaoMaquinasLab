@@ -204,13 +204,13 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
             # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
 
             echo "\
-    deb http://ftp.br.debian.org/debian bookworm          main contrib non-free non-free-firmware 
-    deb http://ftp.br.debian.org/debian bookworm-updates  main contrib non-free non-free-firmware 
-    deb http://security.debian.org      bookworm-security  main contrib non-free
+deb http://ftp.br.debian.org/debian bookworm          main contrib non-free non-free-firmware 
+deb http://ftp.br.debian.org/debian bookworm-updates  main contrib non-free non-free-firmware 
+deb http://security.debian.org      bookworm-security  main contrib non-free
 
-    deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list
+deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list
 
-            echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
+echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
 
         fi
 
@@ -221,7 +221,11 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
                 17)
                     echo "Installing MySQL workbench for Zorin/$version ..."
 
-                    wget https://cdn.mysql.com//Downloads/MySQLGUITools/mysql-workbench-community_8.0.43-1ubuntu22.04_amd64.deb
+                    workbench_deb="mysql-workbench-community_8.0.43-1ubuntu22.04_amd64.deb"
+
+                    if [[ ! f $workbench_deb ]]; then 
+                        wget "https://cdn.mysql.com//Downloads/MySQLGUITools/$workbench_deb"
+                    fi
 
                     sudo apt install -y ./mysql-workbench-community_8.0.43-1ubuntu22.04_amd64.deb
                     sudo apt install -y -f 
@@ -278,59 +282,99 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
     ### PyCharm ###
     ###############
 
-    PYCHARM_VERSION="pycharm-community-2025.2.0.1"
-    PYCHARM_TGZ="${PYCHARM_VERSION}.tar.gz"
-
     if [[ ! -f "${install_dir}/.pycharm-installed.stamp" ]]; then
+        
+        if [[ "$distro" == "zorin" ]]; then
 
-        cd "${install_dir}/DEBS"
+            # zorin has installation on flathub
 
-        if [[ ! -f "${PYCHARM_TGZ}" ]]; then
-            wget "https://download.jetbrains.com/python/${PYCHARM_TGZ}"
-        fi
-
-        if [[ -f "${PYCHARM_TGZ}" ]]; then
-
-            sudo tar xzf pycharm-*.tar.gz -C /opt/
-
-            cd /opt/pycharm-*/bin
-
-            sh pycharm.sh
+            flatpak -y install PyCharm-Community
 
             if [[ $? -eq 0 ]]; then
                 echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
                 touch "${install_dir}/.pycharm-installed.stamp"
             else 
                 echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
-            fi            
+            fi           
 
-        else
-            echo "[`date`] ERROR! Couldn't download PyCharm!" | tee -a ${log}             
-        fi
+        else 
+            # legacy installation
 
-        if [[ 1 -eq 0 ]]; then 
-            chown -R aluno:aluno ${PYCHARM_VERSION}
-            chmod a+x ${PYCHARM_VERSION}/bin/pycharm.sh
+            cd "${install_dir}/DEBS"
 
-            mv ${PYCHARM_VERSION} /home/aluno/.local/.
+            PYCHARM_VERSION="pycharm-community-2025.2.0.1"
+            PYCHARM_TGZ="${PYCHARM_VERSION}.tar.gz"
 
-            if [[ ! -d /home/aluno/.local ]]; then 
-                
-                mkdir /home/aluno/.local
-                sudo chown aluno:aluno /home/aluno/.local
-                
+            if [[ ! -f "${PYCHARM_TGZ}" ]]; then
+                wget "https://download.jetbrains.com/python/${PYCHARM_TGZ}"
             fi
-            echo "export PATH=\"/home/aluno/.local/${PYCHARM_VERSION}/bin:\${PATH}\"" | sudo tee -a /home/aluno/.profile
 
-            cd /home/aluno/Desktop
+            if [[ -f "${PYCHARM_TGZ}" ]]; then
 
-            ln -s /home/aluno/.local/${PYCHARM_VERSION}/bin/pycharm.sh
+                sudo tar xzf pycharm-*.tar.gz -C /opt/
+
+                cd /opt/pycharm-*/bin
+
+                sh pycharm.sh
+
+                if [[ $? -eq 0 ]]; then
+                    echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
+                    touch "${install_dir}/.pycharm-installed.stamp"
+                else 
+                    echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
+                fi         
+
+            else
+                echo "[`date`] ERROR! Couldn't download PyCharm!" | tee -a ${log}             
+            fi
+
+            if [[ 1 -eq 0 ]]; then 
+                chown -R aluno:aluno ${PYCHARM_VERSION}
+                chmod a+x ${PYCHARM_VERSION}/bin/pycharm.sh
+
+                mv ${PYCHARM_VERSION} /home/aluno/.local/.
+
+                if [[ ! -d /home/aluno/.local ]]; then 
+                    
+                    mkdir /home/aluno/.local
+                    sudo chown aluno:aluno /home/aluno/.local
+                    
+                fi
+                echo "export PATH=\"/home/aluno/.local/${PYCHARM_VERSION}/bin:\${PATH}\"" | sudo tee -a /home/aluno/.profile
+
+                cd /home/aluno/Desktop
+
+                ln -s /home/aluno/.local/${PYCHARM_VERSION}/bin/pycharm.sh
+            fi
         fi
-        
+
     else 
 
         echo "[`date`] PyCharm already installed" | tee -a ${log}
 
+    fi
+
+    ################
+    ### Eclipse  ###
+    ################
+
+    if [[ ! -f "${install_dir}/.eclipse-installed.stamp" ]]; then
+        
+        if [[ "$distro" == "zorin" ]]; then
+
+            # zorin has installation on flathub
+
+            flatpak -y install org.eclipse.Java
+
+            if [[ $? -eq 0 ]]; then
+                echo "[`date`] Installation of Eclipse for Java finished" | tee -a ${log}
+                touch "${install_dir}/.eclipse-installed.stamp"
+            else 
+                echo "[`date`] ERROR installing Eclipse for Java for ${distro}/${version}! " | tee -a ${log}
+            fi
+        fi
+    else 
+        echo "[`date`] Eclipse already installe " | tee -a ${log}
     fi
 
     return 0;
@@ -355,7 +399,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
             echo "[`date`] Installation of Packet Tracer finished" | tee -a ${log}
             touch "${install_dir}/.packet-tracer-installed.stamp"
         else 
-            echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
+            echo "[`date`] ERROR installing Packet Tracer for ${distro}/${version}! " | tee -a ${log}
         fi
     else
         echo "[`date`] Packet Tracer already installed"
@@ -365,10 +409,14 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
     ### Wireshark ###
     #################
 
-    # No Debian 12 sid ele está com a instalação quebrada, portanto pegando a versão do repositório bookworm
-    # Se isso mudar ou parar de funcionar, logo abaixo está como compilar o programa na unha
+    if [[ "$distro" == "debian "]]; then 
 
-    sudo apt install -t bookworm -y wireshark
+        # No Debian 12 sid ele está com a instalação quebrada, portanto pegando a versão do repositório bookworm
+        # Se isso mudar ou parar de funcionar, logo abaixo está como compilar o programa na unha
+
+        sudo apt install -t bookworm -y wireshark
+
+    fi
 
     #sudo apt install -y libpcap-dev libglib2.0-dev flex asciidoctor qt6-base-dev cmake libgcrypt20-dev libc-ares-dev qt6-tools-dev libqt6core5compat6-dev libspeexdsp-dev
 
