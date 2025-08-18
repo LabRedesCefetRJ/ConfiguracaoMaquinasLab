@@ -148,8 +148,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
     sudo apt update
     if [[ $? -ne 0 ]]; then
-        echo "[`date`] ERROR during apt update!"
-        return 1
+        echo "[`date`] ERROR during apt update!" | tee -a ${log}
     fi
 
     ################################################
@@ -187,7 +186,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
         fi
 
     else 
-        echo "Packages from APT already installed"
+        echo "[`date`] Packages from APT already installed"
     fi
 
     #######################
