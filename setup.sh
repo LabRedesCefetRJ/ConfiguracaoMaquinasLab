@@ -215,24 +215,27 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
         # O Zorin jah possui o MySQL mas nao o Workbench
         if [[ "$distro" == "zorin" ]]; then 
 
-            if [[ "$version" == "24.04" ]]; then
+            case $version in)
 
-                echo "Installing MySQL workbench for Zorin/$version ..."
+                17)
+                    echo "Installing MySQL workbench for Zorin/$version ..."
 
-                wget https://cdn.mysql.com//Downloads/MySQLGUITools/mysql-workbench-community_8.0.43-1ubuntu24.04_amd64.deb
+                    wget https://cdn.mysql.com//Downloads/MySQLGUITools/mysql-workbench-community_8.0.43-1ubuntu24.04_amd64.deb
 
-                sudo apt install -y ./mysql-workbench-community_8.0.43-1ubuntu24.04_amd64.deb
-                sudo apt install -y -f 
+                    sudo apt install -y ./mysql-workbench-community_8.0.43-1ubuntu24.04_amd64.deb
+                    sudo apt install -y -f 
 
-                if [[ $? -eq 0 ]]; then
-                    echo "[`date`] Installation of MySQL Workbench finished" | tee -a ${log}
-                    touch "${install_dir}/.workbench-installed.stamp"
-                else 
-                    echo "[`date`] ERROR installing MySQL Workbench for Zorin ${version}! " | tee -a ${log}
-                fi
-            else 
-                echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro}/${version}!" | tee -a ${log}
-            fi 
+                    if [[ $? -eq 0 ]]; then
+                        echo "[`date`] Installation of MySQL Workbench finished" | tee -a ${log}
+                        touch "${install_dir}/.workbench-installed.stamp"
+                    else 
+                        echo "[`date`] ERROR installing MySQL Workbench for Zorin ${version}! " | tee -a ${log}
+                    fi
+                    ;;
+                *)
+                    echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro}/${version}!" | tee -a ${log}
+                    ;;
+            esac;
         fi
 
     else
