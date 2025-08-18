@@ -668,11 +668,11 @@ function labredes_customizacao(){
 
         sudo chown aluno:aluno $shortcut
         sudo chmod 555 $shortcut
-        sudo gio set $shortcut metadata::trusted true
+        sudo -u aluno gio set $shortcut metadata::trusted true
 
     done
 
-    exit
+    return 0;
 
     # copiando tudo pro root tambem para facilitar nossa vida
     sudo cp /home/aluno/Desktop/* /root/Desktop/.
