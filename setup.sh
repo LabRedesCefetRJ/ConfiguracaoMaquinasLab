@@ -375,9 +375,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
         fi
     else 
         echo "[`date`] Eclipse already installed" | tee -a ${log}
-    fi
-
-    return 0;
+    fi    
 
     #####################
     ### Packet Tracer ###
@@ -390,7 +388,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
 
     if [[ ! -f "${install_dir}/.packet-tracer-installed.stamp" ]]; then
 
-        wget "http://bsi.cefet-rj.br/repo/~debian/debs/packet_tracer.deb" \
+        wget "http://bsi.cefet-rj.br/repo/~debian/debs/packettracer.deb" \
             -O packettracer.deb
 
         sudo apt install -y ./packettracer.deb
@@ -404,6 +402,8 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
     else
         echo "[`date`] Packet Tracer already installed"
     fi
+
+    return 0;
 
     #################
     ### Wireshark ###
