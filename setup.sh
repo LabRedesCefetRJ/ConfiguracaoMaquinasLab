@@ -284,10 +284,12 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
     if [[ ! -f "${install_dir}/.pycharm-installed.stamp" ]]; then
 
         cd "${install_dir}/DEBS"
-        
-        wget "https://download.jetbrains.com/python/${PYCHARM_TGZ}"
 
-        if [[ $? -eq 0 ]]; then 
+        if [[ ! -f "${PYCHARM_TGZ}" ]]; then
+            wget "https://download.jetbrains.com/python/${PYCHARM_TGZ}"
+        fi
+
+        if [[ -f "${PYCHARM_TGZ}" ]]; then
 
             sudo tar xzf pycharm-*.tar.gz -C /opt/
 
@@ -295,7 +297,18 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
             sh pycharm.sh
 
-            ' :
+            if [[ $? -eq 0 ]]; then
+                echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
+                touch "${install_dir}/.pycharm-installed.stamp"
+            else 
+                echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
+            fi            
+
+        else
+            echo "[`date`] ERROR! Couldn't download PyCharm!" | tee -a ${log}             
+        fi
+
+        if [[ 1 -eq 0 ]]; then 
             chown -R aluno:aluno ${PYCHARM_VERSION}
             chmod a+x ${PYCHARM_VERSION}/bin/pycharm.sh
 
@@ -312,18 +325,8 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
             cd /home/aluno/Desktop
 
             ln -s /home/aluno/.local/${PYCHARM_VERSION}/bin/pycharm.sh
-            '
-
-            if [[ $? -eq 0 ]]; then
-                echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
-                touch "${install_dir}/.pycharm-installed.stamp"
-            else 
-                echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
-            fi
-        else 
-            echo "[`date`] ERROR! Não foi possível baixar o PyCharm!" | tee -a ${log}
         fi
-
+        
     else 
 
         echo "[`date`] PyCharm already installed" | tee -a ${log}
