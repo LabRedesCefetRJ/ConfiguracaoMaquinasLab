@@ -26,7 +26,7 @@ function labredes_install_apps_Internet(){
         ;;
 
         zorin)
-            version="`lsb_release -r | grep "Release" | grep -o -E 1[[:digit:]]+\.[[:digit:]]+1`"
+            version="`lsb_release -r | grep "Release" | grep -o -E '[[:digit:]]+'`"
             echo "Distribution: Zorin"
             echo "Version: $version"
         ;;
