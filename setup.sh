@@ -616,7 +616,7 @@ function labredes_customizacao(){
                 sed 's/#.*AutomaticLoginEnable.*/   AutomaticLoginEnable = true/' /etc/gdm3/custom.conf | sudo tee /tmp/custom.conf
                 sudo mv /tmp/custom.conf /etc/gdm3/custom.conf
 
-                sed 's/#.*AutomaticLogin[[:space:]]=.*/   AutomaticLogin = aluno/' /etc/gdm3/custom.conf | sudo tee /tmp/custom.conf
+                sed 's/#.*AutomaticLogin[[:space:]]*=.*/   AutomaticLogin = aluno/' /etc/gdm3/custom.conf | sudo tee /tmp/custom.conf
                 sudo mv /tmp/custom.conf /etc/gdm3/custom.conf       
 
                 ;;
