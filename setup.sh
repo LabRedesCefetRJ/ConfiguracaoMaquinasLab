@@ -342,7 +342,34 @@ function labredes_customizacao(){
         return 1;
     fi
 
+    distro="$1"
+
+    case $distro in
+
+        debian)
+            echo "Distribution: Debian"
+
+        ;;
+
+        zorin)
+            echo "Distribution: Zorin"
+        ;;
+
+        *)
+            echo "Error: distribution not selected!"
+            echo "Select between: debian, zorin"
+            return -1
+        ;;
+    esac
+
+    return 0;
+
     install_dir="`pwd`"
+
+    ### Adicionando usuario 'aluno' ###
+    echo "cefet" > senha.txt
+
+    adduser --gecos=",,,," aluno < senha.txt
 
     ### Customizacao: colocando 'aluno' no grupo 'dialup' para usar o Arduino ###
 
