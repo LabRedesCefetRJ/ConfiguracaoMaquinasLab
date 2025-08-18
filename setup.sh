@@ -409,7 +409,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
     ### Wireshark ###
     #################
 
-    if [[ "$distro" == "debian "]]; then 
+    if [[ "$distro" == "debian" ]]; then 
 
         # No Debian 12 sid ele está com a instalação quebrada, portanto pegando a versão do repositório bookworm
         # Se isso mudar ou parar de funcionar, logo abaixo está como compilar o programa na unha
