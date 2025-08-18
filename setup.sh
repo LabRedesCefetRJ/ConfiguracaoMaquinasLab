@@ -664,7 +664,8 @@ function labredes_customizacao(){
 
     sudo find /home/aluno/Desktop/ -name \*.desktop | xargs -I{} sudo chown root:root {}
     sudo find /home/aluno/Desktop/ -name \*.desktop | xargs -I{} sudo chmod 555 {}
-    sudo find /home/aluno/Desktop/ -name \*.desktop | xargs -I{} sudo gio set {} metadata::trusted true    
+    sudo find /home/aluno/Desktop/ -name \*.desktop | xargs -I{} sudo gio set {} metadata::trusted true
+    sudo find /home/aluno/Desktop/ -name \*.desktop | xargs -I{} sudo gio set {} metadata::trusted yes
 
     # copiando tudo pro root tambem para facilitar nossa vida
     sudo cp /home/aluno/Desktop/* /root/Desktop/.
