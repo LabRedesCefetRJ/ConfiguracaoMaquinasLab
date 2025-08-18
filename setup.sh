@@ -195,7 +195,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
     ### MySQL Workbench ###
     #######################
 
-    if [[ ! -f "${install_dir}/.workbench-installed.stamp"  ]]; then
+    if [[ ! -f "${install_dir}/.workbench-installed.stamp" ]]; then
 
         if [[ "$distro" == "debian" ]]; then 
 
@@ -229,7 +229,9 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
                     touch "${install_dir}/.workbench-installed.stamp"
                 else 
                     echo "[`date`] ERROR installing MySQL Workbench for Zorin ${version}! " | tee -a ${log}
-                fi                
+                fi
+            else 
+                echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro}/${version}!" | tee -a ${log}
             fi 
         fi
 
