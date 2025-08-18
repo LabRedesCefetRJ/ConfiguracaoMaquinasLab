@@ -77,7 +77,7 @@ function labredes_install_apps_Internet(){
 
         sudo reboot
     else
-        echo "[`date`] Full upgrade jah feito" | tee -a ${log}
+        echo "[`date`] Full upgrade already done" | tee -a ${log}
     fi
 
 
@@ -221,12 +221,12 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
                 17)
                     echo "Installing MySQL workbench for Zorin/$version ..."
 
-                    wget https://cdn.mysql.com//Downloads/MySQLGUITools/mysql-workbench-community_8.0.43-1ubuntu24.04_amd64.deb
+                    wget https://cdn.mysql.com//Downloads/MySQLGUITools/mysql-workbench-community_8.0.43-1ubuntu22.04_amd64.deb
 
-                    sudo apt install -y ./mysql-workbench-community_8.0.43-1ubuntu24.04_amd64.deb
+                    sudo apt install -y ./mysql-workbench-community_8.0.43-1ubuntu22.04_amd64.deb
                     sudo apt install -y -f 
 
-                    if [[ $? -eq 0 ]]; then
+                    if [[ $? -eq 0 ]]; then                    
                         echo "[`date`] Installation of MySQL Workbench for Zorin/${version} finished" | tee -a ${log}
                         touch "${install_dir}/.workbench-installed.stamp"
                     else 
@@ -268,50 +268,67 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
                 touch "${install_dir}/.google-chrome.stamp"
             else 
                 echo "[`date`] ERROR installing Google Chrome for ${distro}/${version}! " | tee -a ${log}
-            fi 
+            fi
 
         fi    
 
     else    
-        echo "Google Chrome already installed " | tee -a ${log}
+        echo "[`date`] Google Chrome already installed " | tee -a ${log}
     fi    
 
     ###############
     ### PyCharm ###
     ###############
 
-    PYCHARM_VERSION="pycharm-community-2023.3.3"
+    PYCHARM_VERSION="pycharm-community-2025.2.0.1"
     PYCHARM_TGZ="${PYCHARM_VERSION}.tar.gz"
 
-    cd "${install_dir}/DEBS"
-    
-    wget "https://download.jetbrains.com/python/${PYCHARM_TGZ}"
+    if [[ ! -f "${install_dir}/.pycharm-installed.stamp" ]]; then
 
-    if [[ $? -eq 0 ]]; then 
+        cd "${install_dir}/DEBS"
+        
+        wget "https://download.jetbrains.com/python/${PYCHARM_TGZ}"
 
-        tar xaf "${PYCHARM_TGZ}"
+        if [[ $? -eq 0 ]]; then 
 
-        chown -R aluno:aluno ${PYCHARM_VERSION}
-        chmod a+x ${PYCHARM_VERSION}/bin/pycharm.sh
+            sudo tar xzf pycharm-*.tar.gz -C /opt/
 
-        mv ${PYCHARM_VERSION} /home/aluno/.local/.
+            cd /opt/pycharm-*/bin
 
-        if [[ ! -d /home/aluno/.local ]]; then 
-            
-            mkdir /home/aluno/.local
-            sudo chown aluno:aluno /home/aluno/.local
-            
+            sh pycharm.sh
+
+'''
+            chown -R aluno:aluno ${PYCHARM_VERSION}
+            chmod a+x ${PYCHARM_VERSION}/bin/pycharm.sh
+
+            mv ${PYCHARM_VERSION} /home/aluno/.local/.
+
+            if [[ ! -d /home/aluno/.local ]]; then 
+                
+                mkdir /home/aluno/.local
+                sudo chown aluno:aluno /home/aluno/.local
+                
+            fi
+            echo "export PATH=\"/home/aluno/.local/${PYCHARM_VERSION}/bin:\${PATH}\"" | sudo tee -a /home/aluno/.profile
+
+            cd /home/aluno/Desktop
+
+            ln -s /home/aluno/.local/${PYCHARM_VERSION}/bin/pycharm.sh
+'''            
+
+            if [[ $? -eq 0 ]]; then
+                echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
+                touch "${install_dir}/.pycharm-installed.stamp"
+            else 
+                echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
+            fi
+        else 
+            echo "[`date`] ERROR! Não foi possível baixar o PyCharm!" | tee -a ${log}
         fi
-
-        echo "export PATH=\"/home/aluno/.local/${PYCHARM_VERSION}/bin:\${PATH}\"" | sudo tee -a /home/aluno/.profile
-
-        cd /home/aluno/Desktop
-
-        ln -s /home/aluno/.local/${PYCHARM_VERSION}/bin/pycharm.sh
 
     else 
 
-        echo "Erro! Não foi possível baixar o PyCharm!" | sudo tee -a ${log}
+        echo "[`date`] PyCharm already installed" | tee -a ${log}
 
     fi
 
@@ -324,19 +341,21 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
     cd "${install_dir}/DEBS"
 
-    wget "http://bsi.cefet-rj.br/repo/~debian/debs/packet_tracer.deb" \
-        -O packettracer.deb
+    if [[ ! -f "${install_dir}/.packet-tracer-installed.stamp" ]]; then
 
-
-    if [[ $? -eq 0 ]]; then 
+        wget "http://bsi.cefet-rj.br/repo/~debian/debs/packet_tracer.deb" \
+            -O packettracer.deb
 
         sudo apt install -y ./packettracer.deb
 
-    else 
-
-        echo "ERROR"
-        echo "Erro! Não foi possível baixar o Packet Tracer!" | sudo tee -a ${log}
-
+        if [[ $? -eq 0 ]]; then
+            echo "[`date`] Installation of Packet Tracer finished" | tee -a ${log}
+            touch "${install_dir}/.packet-tracer-installed.stamp"
+        else 
+            echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
+        fi
+    else
+        echo "[`date`] Packet Tracer already installed"
     fi
 
     #################
