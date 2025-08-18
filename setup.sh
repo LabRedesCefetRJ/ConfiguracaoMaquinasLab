@@ -645,33 +645,33 @@ function labredes_customizacao(){
 
     fi
     
-    sudo cp /usr/share/applications/lxterminal.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/firefox-esr.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/code.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/codeblocks.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/mysql-workbench.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/google-chrome.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/arduino.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/group.chon.ide.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/group.chon.simulide.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/webots.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/logisim.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/cisco-pt821.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/org.wireshark.Wireshark.desktop /home/aluno/Desktop/.
+    cp /usr/share/applications/lxterminal.desktop /home/$USER/Desktop/.
+    cp /usr/share/applications/firefox-esr.desktop /home/$USER/Desktop/.
+    cp /usr/share/applications/code.desktop /home/$USER/Desktop/.
+    cp /usr/share/applications/codeblocks.desktop /home/$USER/Desktop/.
+    cp /usr/share/applications/mysql-workbench.desktop /home/$USER/Desktop/.
+    cp /usr/share/applications/google-chrome.desktop /home/$USER/Desktop/.
+    cp /usr/share/applications/arduino.desktop /home/$USER/Desktop/.
+    cp /usr/share/applications/group.chon.ide.desktop /home/$USER/Desktop/.
+    cp /usr/share/applications/group.chon.simulide.desktop /home/$USER/Desktop/.
+    cp /usr/share/applications/webots.desktop /home/$USER/Desktop/.
+    cp /usr/share/applications/logisim.desktop /home/$USER/Desktop/.
+    cp /usr/share/applications/cisco-pt821.desktop /home/$USER/Desktop/.
+    cp /usr/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
 
     # compilados e dpkgs ficam no /usr/local/share/applications
-    sudo cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/aluno/Desktop/.
+    cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
 
-    for shortcut in $( sudo find /home/aluno/Desktop/ -name \*.desktop ); do
+    for shortcut in $( find /home/$USER/Desktop/ -name \*.desktop ); do
 
         echo "Setting $shortcut ... "
-
-        sudo chown aluno:aluno $shortcut
         
-        sudo gio set $shortcut metadata::trusted true
-        sudo gio set $shortcut metadata::trusted yes
+        gio set $shortcut metadata::trusted true        
 
         sudo chmod 555 $shortcut
+        sudo chown aluno:aluno $shortcut
+
+        cp $shortcut /home/aluno/Desktop/.
 
     done
 
