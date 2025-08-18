@@ -223,7 +223,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
 
                     workbench_deb="mysql-workbench-community_8.0.43-1ubuntu22.04_amd64.deb"
 
-                    if [[ ! f $workbench_deb ]]; then 
+                    if [[ ! -f $workbench_deb ]]; then 
                         wget "https://cdn.mysql.com//Downloads/MySQLGUITools/$workbench_deb"
                     fi
 
