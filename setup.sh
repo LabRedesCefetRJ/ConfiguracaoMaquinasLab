@@ -662,6 +662,10 @@ function labredes_customizacao(){
     # compilados e dpkgs ficam no /usr/local/share/applications
     cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
 
+    return 0
+
+    ls /home/$USER/Desktop/ | 
+
     for shortcut in $( find /home/$USER/Desktop/ -name \*.desktop ); do
 
         echo "Setting $shortcut ... "
