@@ -644,7 +644,7 @@ function labredes_customizacao(){
         sudo chown aluno:aluno /home/aluno/Desktop
 
     fi
-
+    
     sudo cp /usr/share/applications/lxterminal.desktop /home/aluno/Desktop/.
     sudo cp /usr/share/applications/firefox-esr.desktop /home/aluno/Desktop/.
     sudo cp /usr/share/applications/code.desktop /home/aluno/Desktop/.
@@ -662,8 +662,9 @@ function labredes_customizacao(){
     # compilados e dpkgs ficam no /usr/local/share/applications
     sudo cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/aluno/Desktop/.
 
-    sudo ls /home/aluno/Desktop/*.desktop | xargs -I{} sudo chown root:root '{}'
-    sudo ls /home/aluno/Desktop/*.desktop | xargs -I{} sudo chmod 555 '{}'
+    sudo ls /home/aluno/Desktop/*.desktop | xargs -I{} sudo chown root:root {}
+    sudo ls /home/aluno/Desktop/*.desktop | xargs -I{} sudo chmod 555 {}
+    sudo ls /home/aluno/Desktop/*.desktop | xargs -I{} sudo gio set {} metadata::trusted true    
 
     # copiando tudo pro root tambem para facilitar nossa vida
     sudo cp /home/aluno/Desktop/* /root/Desktop/.
