@@ -78,8 +78,6 @@ function labredes_install_apps_Internet(){
         ;;
     esac
 
-    sudo su
-
     ###############################
     ### MySQL & MySQL Workbench ###
     ###############################    
