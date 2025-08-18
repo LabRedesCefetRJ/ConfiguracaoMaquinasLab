@@ -245,7 +245,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
     fi
 
-    exit 0
+    return 0
 
     #####################
     ### Google Chrome ###
