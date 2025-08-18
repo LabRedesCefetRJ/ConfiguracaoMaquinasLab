@@ -596,7 +596,7 @@ function labredes_customizacao(){
     ### Customizacao: autologin ###
 
     if [[ ! -f ${install_dir}/.autologin-ok.stamp ]]; then 
-        case $distro in)
+        case $distro in
             debian|zorin)
                 # Supondo utilizacao do ambiente LXDE
                 cp /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf-`date +"%Y-%m-%d_%H-%M"`.backup
