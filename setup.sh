@@ -14,6 +14,28 @@ function labredes_install_apps_Internet(){
     install_dir="`pwd`"
     error_log="${install_dir}"/errors.log
 
+    distro="$1"
+    version="$2"
+
+    case $distro in
+
+        debian)
+            echo "Distribution: Debian"
+        ;;
+
+        zorin)
+            version="`lsb_release -r | grep "Release" | grep -o -E 1[[:digit:]]+\.[[:digit:]]+1`"
+            echo "Distribution: Zorin"
+            echo "Version: $version"
+        ;;
+
+        *)
+            echo "Error: distribution not selected!"
+            echo "Select between: debian, zorin"
+            return -1
+        ;;
+    esac    
+
     if [[ ! -f packages ]]; then 
 
         echo "Error: file packages not found - aborting ";
@@ -41,7 +63,7 @@ function labredes_install_apps_Internet(){
         sudo apt update
         sudo apt-get -y full-upgrade
 
-        sudo touch "${install_dir}/.full-upgrade.stamp"
+        touch "${install_dir}/.full-upgrade.stamp"
 
         clear
 
@@ -52,50 +74,29 @@ function labredes_install_apps_Internet(){
         sleep 10
 
         sudo reboot
-
+    else
+        echo "Full upgrade jah feito" | tee -a ${error_log}
     fi
 
-    sudo apt-get -y install wget gpg git
 
-    distro="$1"
-    version="$2"
-
-    case $distro in
-
-        debian)
-            echo "Distribution: Debian"
-
-        ;;
-
-        zorin)
-            echo "Distribution: Zorin"
-        ;;
-
-        *)
-            echo "Error: distribution not selected!"
-            echo "Select between: debian, zorin"
-            return -1
-        ;;
-    esac
-
-    ###############################
-    ### MySQL & MySQL Workbench ###
-    ###############################    
+   ##############
+    ### MySQL ###
+    #############
 
     if [[ "$distro" == "debian" ]]; then 
 
         # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
 
         echo "\
-    deb http://ftp.br.debian.org/debian bookworm          main contrib non-free non-free-firmware 
-    deb http://ftp.br.debian.org/debian bookworm-updates  main contrib non-free non-free-firmware 
-    deb http://security.debian.org      bookworm-security  main contrib non-free
+deb http://ftp.br.debian.org/debian bookworm          main contrib non-free non-free-firmware 
+deb http://ftp.br.debian.org/debian bookworm-updates  main contrib non-free non-free-firmware 
+deb http://security.debian.org      bookworm-security  main contrib non-free
 
-    deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list
+deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list
+
+        echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
 
     fi
-
-    echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
 
     ##############
     ### ChonOS ###
@@ -129,26 +130,85 @@ function labredes_install_apps_Internet(){
     ### Instalação dos pacotes via repositorios. ###
     ################################################
 
-    cd "${install_dir}"
-    echo "Starting packages installation on ${install_dir} ..."
+    if [[ ! -f "${install_dir}/.apt-install.stamp"  ]]; then
 
-    ok_pkgs=`mktemp`
-    
-    for pkg in $(cat "$packages"); do
-        echo -n "Checando $pkg ...";
-        apt-get install -q -s -y $pkg > /dev/null
-        if [[ $? -eq 0 ]]; then 
-            echo "ok";
-            echo "$pkg" >> $ok_pkgs ;
+        cd "${install_dir}"
+        echo "Starting packages installation on ${install_dir} ..."
 
+        ok_pkgs=`mktemp`
+        
+        for pkg in $(cat "$packages"); do
+            echo -n "Checando $pkg ...";
+            apt-get install -q -s -y $pkg > /dev/null
+            if [[ $? -eq 0 ]]; then 
+                echo "ok";
+                echo "$pkg" >> $ok_pkgs ;
+
+            else 
+                echo "ERROR";
+                echo "Package not installed: $pkg" >> ${error_log} ;
+            fi
+        done
+
+        sudo apt install linux-headers-`uname -r`
+        sudo apt-get install -y `cat $ok_pkgs`
+
+        if [[ $? -eq 0 ]]; then
+            touch "${install_dir}/.apt-install.stamp"
         else 
-            echo "ERROR";
-            echo "Package not installed: $pkg" >> ${error_log} ;
+            echo "ERROR installing packages from APT! " | tee -a ${error_log}
         fi
-    done
 
-    sudo apt install linux-headers-`uname -r`
-    sudo apt-get install -y `cat $ok_pkgs`
+    else 
+        echo "Packages from APT already installed"
+    fi
+
+    #######################
+    ### MySQL Workbench ###
+    #######################
+
+    if [[ ! -f "${install_dir}/.workbench-installed.stamp"  ]]; then
+
+        if [[ "$distro" == "debian" ]]; then 
+
+            # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
+
+            echo "\
+    deb http://ftp.br.debian.org/debian bookworm          main contrib non-free non-free-firmware 
+    deb http://ftp.br.debian.org/debian bookworm-updates  main contrib non-free non-free-firmware 
+    deb http://security.debian.org      bookworm-security  main contrib non-free
+
+    deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list
+
+            echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
+
+        fi
+
+        # O Zorin jah possui o MySQL mas nao o Workbench
+        if [[ "$distro" == "zorin" ]]; then 
+
+            if [[ "$version" == "24.04" ]]; then
+
+                echo "Installing MySQL workbench for Zorin/$version ..."
+
+                wget https://cdn.mysql.com//Downloads/MySQLGUITools/mysql-workbench-community_8.0.43-1ubuntu24.04_amd64.deb
+
+                sudo apt install -y ./mysql-workbench-community_8.0.43-1ubuntu24.04_amd64.deb
+                sudo apt install -y -f 
+
+                if [[ $? -eq 0 ]]; then
+                    touch "${install_dir}/.workbench-installed.stamp"
+                else 
+                    echo "ERROR installing MySQL Workbench for Zorin ${version}! " | tee -a ${error_log}
+                fi                
+            fi 
+        fi
+
+    else
+
+        echo "MySQL Workbench already installed" | tee -a ${error_log}
+
+    fi
 
     #####################
     ### Google Chrome ###
@@ -156,14 +216,27 @@ function labredes_install_apps_Internet(){
 
     cd "${install_dir}/DEBS"
 
-    GOOGLE_CHROME_DEB=google-chrome-stable_current_amd64.deb
+    if [[ ! -f "${install_dir}/.google-chrome.stamp" ]]; then 
 
-    if [[ ! -f ${GOOGLE_CHROME_DEB} ]]; then
+        GOOGLE_CHROME_DEB=google-chrome-stable_current_amd64.deb
 
-        wget https://dl.google.com/linux/direct/${GOOGLE_CHROME_DEB}
-        sudo apt install -y ./google-chrome-stable_current_amd64.deb
-        sudo apt install -y -f
-    fi
+        if [[ ! -f ${GOOGLE_CHROME_DEB} ]]; then
+
+            wget https://dl.google.com/linux/direct/${GOOGLE_CHROME_DEB}
+            sudo apt install -y ./google-chrome-stable_current_amd64.deb
+            sudo apt install -y -f
+
+            if [[ $? -eq 0 ]]; then
+                touch "${install_dir}/.google-chrome.stamp"
+            else 
+                echo "ERROR installing Google Chrome for ${distro}/${version}! " | tee -a ${error_log}
+            fi 
+
+        fi    
+
+    else    
+        echo "Google Chrome already installed " | tee -a ${error_log}
+    fi    
 
     ###############
     ### PyCharm ###
