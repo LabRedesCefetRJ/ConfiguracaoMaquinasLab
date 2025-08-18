@@ -14,6 +14,8 @@ function labredes_install_apps_Internet(){
     install_dir="`pwd`"
     log="${install_dir}"/installation.log
 
+    > ${log}
+
     distro="$1"
     version="$2"
 
