@@ -234,7 +234,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
                     fi
                     ;;
                 *)
-                    echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro}/${version}!" | tee -a ${log}
+                    echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro} ${version}!" | tee -a ${log}
                     ;;
             esac;
         fi
@@ -244,8 +244,6 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
         echo "[`date`] MySQL Workbench already installed" | tee -a ${log}
 
     fi
-
-    return 0
 
     #####################
     ### Google Chrome ###
@@ -275,6 +273,8 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
     else    
         echo "[`date`] Google Chrome already installed " | tee -a ${log}
     fi    
+
+    return 0;
 
     ###############
     ### PyCharm ###
