@@ -188,7 +188,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
         fi
 
     else 
-        echo "[`date`] Packages from APT already installed"
+        echo "[`date`] Packages from APT already installed" | tee -a ${log}
     fi
 
     #######################
@@ -235,7 +235,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
     else
 
-        echo "MySQL Workbench already installed" | tee -a ${log}
+        echo "[`date`] MySQL Workbench already installed" | tee -a ${log}
 
     fi
 
