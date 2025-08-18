@@ -22,7 +22,12 @@ function labredes_install_apps_Internet(){
 
     fi
 
-    alias sudo="";
+    which sudo
+    if [[ $? -ne 0 ]]; then
+
+        alias sudo=""
+
+    fi
 
     [[ ! -d DEBS ]] && mkdir DEBS
 
