@@ -662,16 +662,15 @@ function labredes_customizacao(){
     # compilados e dpkgs ficam no /usr/local/share/applications
     sudo cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/aluno/Desktop/.
 
-    sudo ls /home/aluno/Desktop/*.desktop | xargs -I{} sudo chown root:root {}
-    sudo ls /home/aluno/Desktop/*.desktop | xargs -I{} sudo chmod 555 {}
-    sudo ls /home/aluno/Desktop/*.desktop | xargs -I{} sudo gio set {} metadata::trusted true    
+    sudo find /home/aluno/Desktop/ -name \*.desktop | xargs -I{} sudo chown root:root {}
+    sudo find /home/aluno/Desktop/ -name \*.desktop | xargs -I{} sudo chmod 555 {}
+    sudo find /home/aluno/Desktop/ -name \*.desktop | xargs -I{} sudo gio set {} metadata::trusted true    
 
     # copiando tudo pro root tambem para facilitar nossa vida
     sudo cp /home/aluno/Desktop/* /root/Desktop/.
     sudo cp /home/aluno/Desktop/* /home/professor/Desktop/.
 
     # Customizacao: alunos nao podem alterar a pasta Desktop
-
     sudo chown root:root /home/aluno/Desktop
     sudo chmod a=rx /home/aluno/Desktop
 
