@@ -669,6 +669,7 @@ function labredes_customizacao(){
 
     # copiando tudo pro root tambem para facilitar nossa vida
     sudo cp /home/aluno/Desktop/* /root/Desktop/.
+    sudo cp /home/aluno/Desktop/* /home/professor/Desktop/.
 
     # Customizacao: alunos nao podem alterar a pasta Desktop
 
