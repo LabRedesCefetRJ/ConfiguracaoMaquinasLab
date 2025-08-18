@@ -613,8 +613,11 @@ function labredes_customizacao(){
             zorin)
                 cp /etc/gdm3/custom.conf /etc/gdm3/custom.conf-`date +"%Y-%m-%d_%H-%M"`.backup
 
-                sed 's/#.*AutomaticLoginEnable.*/   AutomaticLoginEnable = true/g' /etc/gdm3/custom.conf | sudo tee /tmp/custom.conf
-                sudo mv /tmp/custom.conf /etc/gdm3/custom.conf                
+                sed 's/#.*AutomaticLoginEnable.*/   AutomaticLoginEnable = true/' /etc/gdm3/custom.conf | sudo tee /tmp/custom.conf
+                sudo mv /tmp/custom.conf /etc/gdm3/custom.conf
+
+                sed 's/#.*AutomaticLogin[[:space:]]=.*/   AutomaticLogin = aluno/' /etc/gdm3/custom.conf | sudo tee /tmp/custom.conf
+                sudo mv /tmp/custom.conf /etc/gdm3/custom.conf       
 
                 ;;
             *)
