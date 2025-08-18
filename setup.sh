@@ -52,21 +52,45 @@ function labredes_install_apps_Internet(){
 
     sudo apt-get -y install wget gpg git
 
+    distro="$1"
+    version="$2"
+
+    case $distro in
+
+        debian)
+            echo "Distribution: Debian"
+
+        ;;
+
+        zorin)
+            echo "Distribution: Zorin"
+        ;;
+
+        *)
+            echo "Error: distribution not selected!"
+            echo "Select between: debian, zorin"
+            return -1
+        ;;
+    esac    
+
     ###############################
     ### MySQL & MySQL Workbench ###
-    ###############################
+    ###############################    
 
-    # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
+    if [[ "$distro" == "debian"]]; then 
 
-    echo "\
-deb http://ftp.br.debian.org/debian bookworm          main contrib non-free non-free-firmware 
-deb http://ftp.br.debian.org/debian bookworm-updates  main contrib non-free non-free-firmware 
-deb http://security.debian.org      bookworm-security  main contrib non-free
+        # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
 
-deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list
+        echo "\
+    deb http://ftp.br.debian.org/debian bookworm          main contrib non-free non-free-firmware 
+    deb http://ftp.br.debian.org/debian bookworm-updates  main contrib non-free non-free-firmware 
+    deb http://security.debian.org      bookworm-security  main contrib non-free
+
+    deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list
+
+    fi
 
     echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
-
 
     ##############
     ### ChonOS ###
@@ -343,6 +367,7 @@ function labredes_customizacao(){
     fi
 
     distro="$1"
+    version="$2"
 
     case $distro in
 
