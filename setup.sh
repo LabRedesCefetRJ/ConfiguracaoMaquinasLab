@@ -608,7 +608,7 @@ function labredes_customizacao(){
                 sudo mv /tmp/lightdm.conf /etc/lightdm/lightdm.conf
 
                 touch ${install_dir}/.autologin-ok.stamp
-                echo "[`date`] Autologin configured" | tee -a ${log}
+                echo "[`date`] Autologin for Debian configured" | tee -a ${log}
                 ;;
             zorin)
                 cp /etc/gdm3/custom.conf /etc/gdm3/custom.conf-`date +"%Y-%m-%d_%H-%M"`.backup
@@ -619,6 +619,8 @@ function labredes_customizacao(){
                 sed 's/#.*AutomaticLogin[[:space:]]*=.*/   AutomaticLogin = aluno/' /etc/gdm3/custom.conf | sudo tee /tmp/custom.conf
                 sudo mv /tmp/custom.conf /etc/gdm3/custom.conf       
 
+                touch ${install_dir}/.autologin-ok.stamp
+                echo "[`date`] Autologin for Zorin configured" | tee -a ${log}
                 ;;
             *)
                 echo "[`date`] ERROR! Unsupported autologin distro!" | tee -a ${log}
@@ -627,8 +629,6 @@ function labredes_customizacao(){
     else
         echo "[`date`] Autologin already configured" | tee -a ${log}
     fi
-
-    return 0;
 
     ### Customizacao: Senha de root do MySQL ###
 
@@ -687,6 +687,8 @@ function labredes_customizacao(){
 
     sudo chown root:root /var/www/html
     sudo chmod a=rwx /var/www/html
+
+    return 0;
 
     # Customizacao: alunos nao podem mudar o papel de parede
 
