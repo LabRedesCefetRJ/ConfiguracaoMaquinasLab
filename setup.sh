@@ -274,8 +274,6 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
         echo "[`date`] Google Chrome already installed " | tee -a ${log}
     fi    
 
-    return 0;
-
     ###############
     ### PyCharm ###
     ###############
@@ -331,6 +329,8 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
         echo "[`date`] PyCharm already installed" | tee -a ${log}
 
     fi
+
+    return 0;
 
     #####################
     ### Packet Tracer ###
