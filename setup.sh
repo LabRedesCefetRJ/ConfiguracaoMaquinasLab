@@ -295,7 +295,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
             sh pycharm.sh
 
-'''
+            ' :
             chown -R aluno:aluno ${PYCHARM_VERSION}
             chmod a+x ${PYCHARM_VERSION}/bin/pycharm.sh
 
@@ -312,7 +312,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
             cd /home/aluno/Desktop
 
             ln -s /home/aluno/.local/${PYCHARM_VERSION}/bin/pycharm.sh
-'''            
+            '
 
             if [[ $? -eq 0 ]]; then
                 echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
