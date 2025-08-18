@@ -77,7 +77,7 @@ function labredes_install_apps_Internet(){
     ### MySQL & MySQL Workbench ###
     ###############################    
 
-    if [[ "$distro" == "debian"]]; then 
+    if [[ "$distro" == "debian" ]]; then 
 
         # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
 
