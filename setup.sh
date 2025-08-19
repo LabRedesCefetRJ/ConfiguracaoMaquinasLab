@@ -711,9 +711,7 @@ function labredes_customizacao(){
 
         cd /home/aluno/.local/share/backgrounds
 
-        #wget https://images3.alphacoders.com/221/221297.png \
-        wget https://github.com/dharmx/walls/blob/6bf4d733ebf2b484a37c17d742eb47e5139e6a14/digital/a_foggy_forest_with_trees_and_bushes.png \    
-            -O labredes_wallpaper.png
+        cp ${install_dir}/wallpapers/cyberpunk1.jpg labredes_wallpaper.jpg
 
         wallpaper_path="`pwd`/labredes_wallpaper.png" 
 
