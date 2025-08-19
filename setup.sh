@@ -641,8 +641,9 @@ function labredes_customizacao(){
     if [[ ! -f ${install_dir}/.autologin.stamp ]]; then
         touch ${install_dir}/.autologin.stamp
         sudo cp -r ${install_dir}/ /home/aluno/ConfiguracaoMaquinasLab/
+        sudo chown aluno:aluno -R /home/aluno/ConfiguracaoMaquinasLab/
 
-        echo "Restarting machine in 10 seconds ... continue the procedure from the login 'aluno' and folder '/home/aluno/ConfiguracaoMaquinasLab/' "
+        echo "Restarting machine in 10 seconds ... continue the procedure from login 'aluno' and folder '/home/aluno/ConfiguracaoMaquinasLab/' "
         sleep 10
         sudo reboot
     fi
@@ -677,9 +678,9 @@ function labredes_customizacao(){
         # compilados e dpkgs ficam no /usr/local/share/applications
         cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
 
-        sudo cp /home/$USER/Desktop/*.desktop /home/aluno/Desktop/.
+        # sudo cp /home/$USER/Desktop/*.desktop /home/aluno/Desktop/.
 
-        sudo crontab -u aluno -l | sudo tee /home/aluno/crontab.old
+        # sudo crontab -u aluno -l | sudo tee /home/aluno/crontab.old
 
         #> crontab.gio
 
@@ -704,17 +705,17 @@ function labredes_customizacao(){
         echo "[`date`] Shortcuts already configured" | tee -a ${log}
     fi     
 
+    if [[ "$USER" != "professor" ]]; then
+        echo "Not logged as 'professor', run the script again with that login"
+        return -1;
+    fi
+
     # copiando tudo pro root tambem para facilitar nossa vida
 
-    sudp cp /home/aluno/Desktop/* /root/Desktop/.
+    sudo cp /home/aluno/Desktop/* /root/Desktop/.
     sudo cp /home/aluno/Desktop/* /home/professor/Desktop/.
 
     return 0;
-
-    if [[ "$USER" != "professor" ]]; then
-        echo "Not logged as 'professor', aborting"
-        return -1;
-    fi
 
     # Customizacao: alunos nao podem alterar a pasta Desktop
 
