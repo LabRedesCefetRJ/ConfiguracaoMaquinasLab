@@ -693,7 +693,7 @@ function labredes_customizacao(){
 
         #> crontab.gio
 
-        for shortcut in $( sudo find /home/aluno/Desktop/ -name \*.desktop ); do
+        for shortcut in $( find /home/aluno/Desktop/ -name \*.desktop ); do
             
             #echo "@reboot gio set $shortcut metadata::trusted true" >> crontab.gio
 
