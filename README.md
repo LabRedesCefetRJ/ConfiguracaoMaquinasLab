@@ -72,6 +72,11 @@ labredes_customizacao zorin
 
 ```
 su professor
+```
+
+7. Execute o script uma última vez.
+
+```
 cd /opt/ConfiguracaoMaquinasLab
 . setup.sh
 labredes_customizacao zorin
