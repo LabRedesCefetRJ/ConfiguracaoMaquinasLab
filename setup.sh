@@ -710,7 +710,7 @@ function labredes_customizacao(){
 
     ### Customizacao: alunos nao podem mudar o papel de parede ###
 
-    if [[ ! -f ${install_dir}/.wallpaper.stamp ]]; then 
+    if [[ ! -f ${install_dir}/.wallpaper1.stamp ]]; then 
 
         cd /home/aluno/.local/share
 
@@ -720,7 +720,7 @@ function labredes_customizacao(){
 
         cp ${install_dir}/wallpapers/cyberpunk1.jpg labredes_wallpaper.jpg
 
-        wallpaper_path="`pwd`/labredes_wallpaper.jpg" 
+        wallpaper_path="`pwd`/labredes_wallpaper.jpg"
 
         case $distro in
             debian)
@@ -747,6 +747,18 @@ function labredes_customizacao(){
                 ;;
             zorin)
                 # Zorin 17 usa o Gnome
+
+                cd /home/aluno/.local/share
+
+                [[ ! -d backgrounds ]] && mkdir backgrounds
+
+                cd backgrounds
+
+                cp ${install_dir}/wallpapers/cyberpunk1.jpg labredes_wallpaper.jpg
+
+                wallpaper_path="`pwd`/labredes_wallpaper.jpg"
+
+                # Zorin 17 usa o Gnome
                 gsettings set org.gnome.desktop.background picture-uri "file://${wallpaper_path}"
                 ;;
 
@@ -754,7 +766,7 @@ function labredes_customizacao(){
                 echo "[`date`] ERROR! Distribution not supported!" | tee -a ${log}
         esac
 
-        touch ${install_dir}/.wallpaper.stamp
+        touch ${install_dir}/.wallpaper1.stamp
         echo "[`date`] Wallpaper configured" | tee -a ${log}
     else
         echo "[`date`] Wallpaper already configured" | tee -a ${log}
@@ -793,12 +805,74 @@ function labredes_customizacao(){
         sudo chown root:root /var/www/
         sudo chmod a=rwx -R /var/www/
 
+        # Customizacao: alunos 
+        sudo touch /etc/dconf/db/local.d/00-wallpaper
+
         touch ${install_dir}/.permissions-aluno.stamp
         echo "[`date`] Permissions for 'aluno' configured" | tee -a ${log}
     else
         echo "[`date`] Permissions for 'aluno' already configured" | tee -a ${log}
     fi     
-    
+
+
+    if [[ ! -f ${install_dir}/.wallpaper2.stamp ]]; then
+        # A parte 2 envolve usar sudo
+        
+        case $distro in
+            debian)
+                # supondo ambiente grafico LXDE
+                cd /home/aluno/.config/pcmanfm
+
+                sudo chown root:root LXDE
+                sudo chmod a=rx LXDE
+
+                cd LXDE
+
+                cp desktop-items-0.conf desktop-items-0.conf-`date +"%Y-%m-%d_%H-%M"`.backup
+
+                sed "s|^wallpaper=.*|wallpaper=${wallpaper_path}|g" desktop-items-0.conf > novo_desktop.conf
+
+                mv novo_desktop.conf desktop-items-0.conf
+
+                sudo chown root:root ./desktop-items-0.conf
+                sudo chmod a=r ./desktop-items-0.conf
+
+                sudo cp /etc/xdg/pcmanfm/default/pcmanfm.conf .
+                sudo chown root:root pcmanfm.conf
+                sudo chmod a=r pcmanfm.conf
+                ;;
+            zorin)
+                # Zorin 17 usa o Gnome
+                wallpaper_path="/home/aluno/.local/share/backgrounds/labredes_wallpaper.jpg"
+
+                sudo mkdir -p /etc/dconf/db/local.d/
+
+                echo '[org/gnome/desktop/background]' | sudo tee /etc/dconf/db/local.d/00-wallpaper
+                echo "picture-uri='file://${wallpaper_path}'" | sudo tee -a /etc/dconf/db/local.d/00-wallpaper
+                echo "picture-uri-dark='file://${wallpaper_path}'" | sudo tee -a /etc/dconf/db/local.d/00-wallpaper
+
+                sudo mkdir -p /etc/dconf/db/local.d/locks
+                sudo touch /etc/dconf/db/local.d/locks/background
+
+                echo "/org/gnome/desktop/background/picture-uri" | sudo tee -a /etc/dconf/db/local.d/locks/background
+                echo "/org/gnome/desktop/background/picture-uri-dark" | sudo tee -a /etc/dconf/db/local.d/locks/background
+
+                sudo dconf update
+
+                ;;
+
+            *) 
+                echo "[`date`] ERROR! Distribution not supported!" | tee -a ${log}
+        esac        
+
+
+
+        touch ${install_dir}/.wallpaper2.stamp
+        echo "[`date`] Wallpaper configured" | tee -a ${log}
+    else
+        echo "[`date`] Wallpaper already configured" | tee -a ${log}
+    fi 
+
     # Customizacao: adicionando algumas aplicacoes padrao ao sistema
 
     echo "application/pdf=org.kde.okular.desktop" | sudo tee -a /usr/share/applications/defaults.list
