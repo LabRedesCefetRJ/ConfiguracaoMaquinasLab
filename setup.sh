@@ -662,20 +662,17 @@ function labredes_customizacao(){
     # compilados e dpkgs ficam no /usr/local/share/applications
     cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
 
-    return 0
+    cp /home/$USER/Desktop/*.desktop /home/aluno/Desktop/.
 
-    ls /home/$USER/Desktop/ | 
-
-    for shortcut in $( find /home/$USER/Desktop/ -name \*.desktop ); do
+    for shortcut in $( sudo find /home/aluno/Desktop/ -name \*.desktop ); do
 
         echo "Setting $shortcut ... "
+
+        sudo chown aluno:aluno $shortcut
         
-        gio set $shortcut metadata::trusted true        
+        su - aluno -c gio set $shortcut metadata::trusted true
 
         sudo chmod 555 $shortcut
-        sudo chown aluno:aluno $shortcut
-
-        sudo cp $shortcut /home/aluno/Desktop/.
 
     done
 
