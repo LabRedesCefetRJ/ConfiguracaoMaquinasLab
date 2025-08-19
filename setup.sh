@@ -723,9 +723,11 @@ function labredes_customizacao(){
 
     sudo chown root:root /home/aluno/.profile
     sudo chown root:root /home/aluno/.bashrc
+    sudo chown root:root /home/aluno/.bash_logout
 
     sudo chmod a=r /home/aluno/.profile
     sudo chmod a=r /home/aluno/.bashrc
+    sudo chmod a=r /home/aluno/.bash_logout
 
     # Customizacao: todos podem escrever e alterar a pasta do servidor web
 
