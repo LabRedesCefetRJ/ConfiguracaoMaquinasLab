@@ -716,6 +716,8 @@ function labredes_customizacao(){
 
         [[ ! -d backgrounds ]] && mkdir backgrounds
 
+        cd backgrounds
+
         cp ${install_dir}/wallpapers/cyberpunk1.jpg labredes_wallpaper.jpg
 
         wallpaper_path="`pwd`/labredes_wallpaper.jpg" 
