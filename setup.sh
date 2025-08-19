@@ -649,10 +649,11 @@ function labredes_customizacao(){
 
         touch ${install_dir}/.1st-reboot.stamp
 
-        sudo cp -r ${install_dir}/ /home/aluno/ConfiguracaoMaquinasLab/
-        sudo chown aluno:aluno -R /home/aluno/ConfiguracaoMaquinasLab/
+        sudo cp -r ${install_dir}/ /tmp/ConfiguracaoMaquinasLab/
+        sudo chown aluno:aluno -R /tmp/ConfiguracaoMaquinasLab/
+        sudo chmod a=rwx -R /tmp/ConfiguracaoMaquinasLab/
 
-        echo "Restarting machine in 10 seconds ... continue the procedure from login 'aluno' and folder '/home/aluno/ConfiguracaoMaquinasLab/' "
+        echo "Restarting machine in 10 seconds ... continue the procedure from login 'aluno' and folder '/tmp/ConfiguracaoMaquinasLab/' "
         sleep 10
         sudo reboot
     fi
@@ -687,29 +688,14 @@ function labredes_customizacao(){
         # compilados e dpkgs ficam no /usr/local/share/applications
         cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
 
-        # sudo cp /home/$USER/Desktop/*.desktop /home/aluno/Desktop/.
-
-        # sudo crontab -u aluno -l | sudo tee /home/aluno/crontab.old
-
-        #> crontab.gio
-
-        for shortcut in $( find /home/aluno/Desktop/ -name \*.desktop ); do
-            
-            #echo "@reboot gio set $shortcut metadata::trusted true" >> crontab.gio
-
-            #sudo chown aluno:aluno $shortcut
-
-            #sudo chmod 555 $shortcut
+        for shortcut in $( find /home/aluno/Desktop/ -name \*.desktop ); do        
 
             gio set $shortcut metadata::trusted true
 
             chmod a=rx $shortcut
         done
 
-        #sudo crontab -u aluno ./crontab.gio
-
-        touch ${install_dir}/.autologin.stamp
-        cp -r ./ /home/aluno/ConfiguracaoMaquinasLab
+        touch ${install_dir}/.autologin.stamp        
         echo "[`date`] Shortcuts configured" | tee -a ${log}
 
     else
