@@ -681,15 +681,18 @@ function labredes_customizacao(){
 
     sudo crontab -u aluno ./crontab.gio
 
-    sudo reboot
-
-    return 0;
+    if [[ ! -f ${install_dir}/.custom-shortcuts.stamp ]]; then
+        touch ${install_dir}/.custom-shortcuts.stamp
+        sudo reboot
+    fi
 
     # copiando tudo pro root tambem para facilitar nossa vida
+
     sudo cp /home/aluno/Desktop/* /root/Desktop/.
     sudo cp /home/aluno/Desktop/* /home/professor/Desktop/.
 
     # Customizacao: alunos nao podem alterar a pasta Desktop
+
     sudo chown root:root /home/aluno/Desktop
     sudo chmod a=rx /home/aluno/Desktop
 
@@ -706,34 +709,43 @@ function labredes_customizacao(){
     sudo chown root:root /var/www/html
     sudo chmod a=rwx /var/www/html
 
-    return 0;
+    return 0
 
     # Customizacao: alunos nao podem mudar o papel de parede
-
-    cd /home/aluno/.config/pcmanfm
-
-    sudo chown root:root LXDE
-    sudo chmod a=rx LXDE
-
-    cd LXDE
 
     wget https://images3.alphacoders.com/221/221297.png \
         -O labredes_wallpaper.png
 
     wallpaper_path="`pwd`/labredes_wallpaper.png"
 
-    cp desktop-items-0.conf desktop-items-0.conf-`date +"%Y-%m-%d_%H-%M"`.backup
+    case $distro in
+        debian)
+            # supondo ambiente grafico LXDE
 
-    sed "s|^wallpaper=.*|wallpaper=${wallpaper_path}|g" desktop-items-0.conf > novo_desktop.conf
+            cd /home/aluno/.config/pcmanfm
 
-    mv novo_desktop.conf desktop-items-0.conf
+            sudo chown root:root LXDE
+            sudo chmod a=rx LXDE
 
-    sudo chown root:root ./desktop-items-0.conf
-    sudo chmod a=r ./desktop-items-0.conf
+            cd LXDE
 
-    sudo cp /etc/xdg/pcmanfm/default/pcmanfm.conf .
-    sudo chown root:root pcmanfm.conf
-    sudo chmod a=r pcmanfm.conf
+            cp desktop-items-0.conf desktop-items-0.conf-`date +"%Y-%m-%d_%H-%M"`.backup
+
+            sed "s|^wallpaper=.*|wallpaper=${wallpaper_path}|g" desktop-items-0.conf > novo_desktop.conf
+
+            mv novo_desktop.conf desktop-items-0.conf
+
+            sudo chown root:root ./desktop-items-0.conf
+            sudo chmod a=r ./desktop-items-0.conf
+
+            sudo cp /etc/xdg/pcmanfm/default/pcmanfm.conf .
+            sudo chown root:root pcmanfm.conf
+            sudo chmod a=r pcmanfm.conf        
+            ;;
+        zorin)
+            ;;
+
+    esac
 
     # Customizacao: adicionando algumas aplicacoes padrao ao sistema
 
