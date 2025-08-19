@@ -705,6 +705,56 @@ function labredes_customizacao(){
         echo "[`date`] Shortcuts already configured" | tee -a ${log}
     fi     
 
+    ### Customizacao: alunos nao podem mudar o papel de parede ###
+
+    if [[ ! -f ${install_dir}/.wallpaper.stamp ]]; then 
+
+        cd /home/aluno/.local/share/backgrounds
+
+        #wget https://images3.alphacoders.com/221/221297.png \
+        wget https://github.com/dharmx/walls/blob/6bf4d733ebf2b484a37c17d742eb47e5139e6a14/digital/a_foggy_forest_with_trees_and_bushes.png \    
+            -O labredes_wallpaper.png
+
+        wallpaper_path="`pwd`/labredes_wallpaper.png" 
+
+        case $distro in
+            debian)
+                # supondo ambiente grafico LXDE
+                cd /home/aluno/.config/pcmanfm
+
+                sudo chown root:root LXDE
+                sudo chmod a=rx LXDE
+
+                cd LXDE
+
+                cp desktop-items-0.conf desktop-items-0.conf-`date +"%Y-%m-%d_%H-%M"`.backup
+
+                sed "s|^wallpaper=.*|wallpaper=${wallpaper_path}|g" desktop-items-0.conf > novo_desktop.conf
+
+                mv novo_desktop.conf desktop-items-0.conf
+
+                sudo chown root:root ./desktop-items-0.conf
+                sudo chmod a=r ./desktop-items-0.conf
+
+                sudo cp /etc/xdg/pcmanfm/default/pcmanfm.conf .
+                sudo chown root:root pcmanfm.conf
+                sudo chmod a=r pcmanfm.conf
+                ;;
+            zorin)
+                # Zorin 17 usa o Gnome
+                ;;
+
+            *) 
+                echo "[`date`] ERROR! Distribution not supported!" | tee -a ${log}
+        esac
+
+        touch ${install_dir}/.wallpaper.stamp
+        echo "[`date`] Wallpaper configured" | tee -a ${log}
+    else
+        echo "[`date`] Wallpaper already configured" | tee -a ${log}
+    fi     
+
+
     if [[ "$USER" != "professor" ]]; then
         echo "Not logged as 'professor', run the script again with that login"
         return -1;
@@ -742,45 +792,7 @@ function labredes_customizacao(){
     else
         echo "[`date`] Permissions for 'aluno' already configured" | tee -a ${log}
     fi     
-
-    return 0
-
-    # Customizacao: alunos nao podem mudar o papel de parede
-
-    wget https://images3.alphacoders.com/221/221297.png \
-        -O labredes_wallpaper.png
-
-    wallpaper_path="`pwd`/labredes_wallpaper.png"
-
-    case $distro in
-        debian)
-            # supondo ambiente grafico LXDE
-
-            cd /home/aluno/.config/pcmanfm
-
-            sudo chown root:root LXDE
-            sudo chmod a=rx LXDE
-
-            cd LXDE
-
-            cp desktop-items-0.conf desktop-items-0.conf-`date +"%Y-%m-%d_%H-%M"`.backup
-
-            sed "s|^wallpaper=.*|wallpaper=${wallpaper_path}|g" desktop-items-0.conf > novo_desktop.conf
-
-            mv novo_desktop.conf desktop-items-0.conf
-
-            sudo chown root:root ./desktop-items-0.conf
-            sudo chmod a=r ./desktop-items-0.conf
-
-            sudo cp /etc/xdg/pcmanfm/default/pcmanfm.conf .
-            sudo chown root:root pcmanfm.conf
-            sudo chmod a=r pcmanfm.conf        
-            ;;
-        zorin)
-            ;;
-
-    esac
-
+    
     # Customizacao: adicionando algumas aplicacoes padrao ao sistema
 
     echo "application/pdf=org.kde.okular.desktop" | sudo tee -a /usr/share/applications/defaults.list
