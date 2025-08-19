@@ -622,7 +622,6 @@ function labredes_customizacao(){
                 touch ${install_dir}/.autologin-ok.stamp
                 echo "[`date`] Autologin for Zorin configured" | tee -a ${log}
 
-                sudo reboot
                 ;;
             *)
                 echo "[`date`] ERROR! Unsupported autologin distro!" | tee -a ${log}
@@ -666,17 +665,19 @@ function labredes_customizacao(){
 
     sudo cp /home/$USER/Desktop/*.desktop /home/aluno/Desktop/.
 
+    sudo crontab -u aluno -l | sudo tee /home/aluno/crontab.old
+
+    > crontab.gio
+
     for shortcut in $( sudo find /home/aluno/Desktop/ -name \*.desktop ); do
-
-        echo "Setting $shortcut ... "
-
-        sudo chown aluno:aluno $shortcut
         
-        su - aluno -c "gio set $shortcut metadata::trusted true"
-
-        sudo chmod 555 $shortcut
+        echo "@reboot gio set $shortcut metadata::trusted true" >> crontab.gio
 
     done
+
+    sudo crontab -u aluno ./crontab.gio
+
+    sudo reboot
 
     return 0;
 
