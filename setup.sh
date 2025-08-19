@@ -696,6 +696,8 @@ function labredes_customizacao(){
             chmod a=rx $shortcut
         done
 
+        ln -s /var/www /home/aluno/Desktop/www
+
         touch ${install_dir}/.shortcuts.stamp
         echo "[`date`] Shortcuts configured" | tee -a ${log}
 
