@@ -725,26 +725,15 @@ function labredes_customizacao(){
         case $distro in
             debian)
                 # supondo ambiente grafico LXDE
-                cd /home/aluno/.config/pcmanfm
-
-                sudo chown root:root LXDE
-                sudo chmod a=rx LXDE
-
-                cd LXDE
+                cd /home/aluno/.config/pcmanfm/LXDE
 
                 cp desktop-items-0.conf desktop-items-0.conf-`date +"%Y-%m-%d_%H-%M"`.backup
 
                 sed "s|^wallpaper=.*|wallpaper=${wallpaper_path}|g" desktop-items-0.conf > novo_desktop.conf
 
                 mv novo_desktop.conf desktop-items-0.conf
-
-                sudo chown root:root ./desktop-items-0.conf
-                sudo chmod a=r ./desktop-items-0.conf
-
-                sudo cp /etc/xdg/pcmanfm/default/pcmanfm.conf .
-                sudo chown root:root pcmanfm.conf
-                sudo chmod a=r pcmanfm.conf
                 ;;
+                
             zorin)
                 # Zorin 17 usa o Gnome
 
@@ -826,13 +815,7 @@ function labredes_customizacao(){
                 sudo chown root:root LXDE
                 sudo chmod a=rx LXDE
 
-                cd LXDE
-
-                cp desktop-items-0.conf desktop-items-0.conf-`date +"%Y-%m-%d_%H-%M"`.backup
-
-                sed "s|^wallpaper=.*|wallpaper=${wallpaper_path}|g" desktop-items-0.conf > novo_desktop.conf
-
-                mv novo_desktop.conf desktop-items-0.conf
+                sudo LXDE
 
                 sudo chown root:root ./desktop-items-0.conf
                 sudo chmod a=r ./desktop-items-0.conf
@@ -845,20 +828,7 @@ function labredes_customizacao(){
                 # Zorin 17 usa o Gnome
                 wallpaper_path="/home/aluno/.local/share/backgrounds/labredes_wallpaper.jpg"
 
-                sudo mkdir -p /etc/dconf/db/local.d/
-
-                echo '[org/gnome/desktop/background]' | sudo tee /etc/dconf/db/local.d/00-wallpaper
-                echo "picture-uri='file://${wallpaper_path}'" | sudo tee -a /etc/dconf/db/local.d/00-wallpaper
-                echo "picture-uri-dark='file://${wallpaper_path}'" | sudo tee -a /etc/dconf/db/local.d/00-wallpaper
-
-                sudo mkdir -p /etc/dconf/db/local.d/locks
-                sudo touch /etc/dconf/db/local.d/locks/background
-
-                echo "/org/gnome/desktop/background/picture-uri" | sudo tee -a /etc/dconf/db/local.d/locks/background
-                echo "/org/gnome/desktop/background/picture-uri-dark" | sudo tee -a /etc/dconf/db/local.d/locks/background
-
-                sudo dconf update
-
+                sudo chattr +i /home/aluno/.config/dconf/user
                 ;;
 
             *) 
