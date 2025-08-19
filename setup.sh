@@ -587,10 +587,11 @@ function labredes_customizacao(){
 
         ### Customizacao: colocando 'aluno' no grupo 'dialup' para usar o Arduino ###
         # Grupos complementares: plugdev (pendive), cdrom, lpadmin (impressoras)
-        sudo usermod -aG dialout,plugdev,cdrom,users,lpadmin aluno         
+        sudo usermod -aG dialout,plugdev,cdrom,users,lpadmin aluno     
 
+        echo "[`date`] User 'aluno' configured" | tee -a ${log}
     else
-        echo "[`date`] Usuario 'aluno' jah adicionado" | tee -a ${log}
+        echo "[`date`] User 'aluno' already configured" | tee -a ${log}
     fi
 
     ### Customizacao: Senha de root do MySQL ###
