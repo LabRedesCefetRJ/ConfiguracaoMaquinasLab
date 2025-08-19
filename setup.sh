@@ -733,7 +733,7 @@ function labredes_customizacao(){
 
                 mv novo_desktop.conf desktop-items-0.conf
                 ;;
-                
+
             zorin)
                 # Zorin 17 usa o Gnome
 
@@ -763,7 +763,7 @@ function labredes_customizacao(){
 
 
     if [[ "$USER" != "professor" ]]; then
-        echo "Not logged as 'professor', run the script again with that login"
+        echo "Not logged as 'professor', run the script again with that login to continue"
         return -1;
     fi
 
@@ -834,8 +834,6 @@ function labredes_customizacao(){
             *) 
                 echo "[`date`] ERROR! Distribution not supported!" | tee -a ${log}
         esac        
-
-
 
         touch ${install_dir}/.wallpaper2.stamp
         echo "[`date`] Wallpaper configured" | tee -a ${log}
