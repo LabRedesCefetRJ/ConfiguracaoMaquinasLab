@@ -611,6 +611,7 @@ function labredes_customizacao(){
                 echo "[`date`] Autologin for Debian configured" | tee -a ${log}
                 ;;
             zorin)
+                # Zorin 17 utiliza o Gnome 3 (gdm)
                 cp /etc/gdm3/custom.conf /etc/gdm3/custom.conf-`date +"%Y-%m-%d_%H-%M"`.backup
 
                 sed 's/#.*AutomaticLoginEnable.*/   AutomaticLoginEnable = true/' /etc/gdm3/custom.conf | sudo tee /tmp/custom.conf
@@ -637,59 +638,81 @@ function labredes_customizacao(){
 
     echo "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${root_passwd}'" | sudo mysql
 
-    ### Customizacao: Atalhos para aplicativos na Área de Trabalho e não podem apagar ou salvar coisas nela ###
-
-    if [[ ! -d /home/aluno/Desktop ]]; then 
-
-        sudo mkdir /home/aluno/Desktop
-        sudo chown aluno:aluno /home/aluno/Desktop
-
-    fi
-    
-    cp /usr/share/applications/lxterminal.desktop /home/$USER/Desktop/.
-    cp /usr/share/applications/firefox-esr.desktop /home/$USER/Desktop/.
-    cp /usr/share/applications/code.desktop /home/$USER/Desktop/.
-    cp /usr/share/applications/codeblocks.desktop /home/$USER/Desktop/.
-    cp /usr/share/applications/mysql-workbench.desktop /home/$USER/Desktop/.
-    cp /usr/share/applications/google-chrome.desktop /home/$USER/Desktop/.
-    cp /usr/share/applications/arduino.desktop /home/$USER/Desktop/.
-    cp /usr/share/applications/group.chon.ide.desktop /home/$USER/Desktop/.
-    cp /usr/share/applications/group.chon.simulide.desktop /home/$USER/Desktop/.
-    cp /usr/share/applications/webots.desktop /home/$USER/Desktop/.
-    cp /usr/share/applications/logisim.desktop /home/$USER/Desktop/.
-    cp /usr/share/applications/cisco-pt821.desktop /home/$USER/Desktop/.
-    cp /usr/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
-
-    # compilados e dpkgs ficam no /usr/local/share/applications
-    cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
-
-    sudo cp /home/$USER/Desktop/*.desktop /home/aluno/Desktop/.
-
-    sudo crontab -u aluno -l | sudo tee /home/aluno/crontab.old
-
-    > crontab.gio
-
-    for shortcut in $( sudo find /home/aluno/Desktop/ -name \*.desktop ); do
-
-        sudo chown aluno:aluno $shortcut
-
-        sudo chmod 555 $shortcut
-        
-        echo "@reboot gio set $shortcut metadata::trusted true" >> crontab.gio
-
-    done
-
-    sudo crontab -u aluno ./crontab.gio
-
-    if [[ ! -f ${install_dir}/.custom-shortcuts.stamp ]]; then
-        touch ${install_dir}/.custom-shortcuts.stamp
+    if [[ ! -f ${install_dir}/.autologin.stamp ]]; then
+        touch ${install_dir}/.autologin.stamp
+        cp -r ./ /home/aluno/ConfiguracaoMaquinasLab
+        echo "Restarting machine ... continue the procedure from the login 'aluno'"
         sudo reboot
     fi
 
+    ### Customizacao: Atalhos para aplicativos na Área de Trabalho e não podem apagar ou salvar coisas nela ###
+
+    # A partir desta parte, deve-se utilizar o script do proprio login de aluno
+
+    if [[ ! -f ${install_dir}/.shortcuts.stamp ]]; then
+
+        if [[ ! -d /home/aluno/Desktop ]]; then 
+
+            sudo mkdir /home/aluno/Desktop
+            sudo chown aluno:aluno /home/aluno/Desktop
+
+        fi
+        
+        cp /usr/share/applications/lxterminal.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/firefox-esr.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/code.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/codeblocks.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/mysql-workbench.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/google-chrome.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/arduino.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/group.chon.ide.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/group.chon.simulide.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/webots.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/logisim.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/cisco-pt821.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
+
+        # compilados e dpkgs ficam no /usr/local/share/applications
+        cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
+
+        sudo cp /home/$USER/Desktop/*.desktop /home/aluno/Desktop/.
+
+        sudo crontab -u aluno -l | sudo tee /home/aluno/crontab.old
+
+        #> crontab.gio
+
+        for shortcut in $( sudo find /home/aluno/Desktop/ -name \*.desktop ); do
+            
+            #echo "@reboot gio set $shortcut metadata::trusted true" >> crontab.gio
+
+            #sudo chown aluno:aluno $shortcut
+
+            #sudo chmod 555 $shortcut
+
+            gio set $shortcut metadata::trusted true
+        done
+
+        #sudo crontab -u aluno ./crontab.gio
+
+        touch ${install_dir}/.autologin.stamp
+        cp -r ./ /home/aluno/ConfiguracaoMaquinasLab
+        echo "[`date`] Shortcuts configured" | tee -a ${log}
+
+    else
+        echo "[`date`] Shortcuts already configured" | tee -a ${log}
+    fi     
+
     # copiando tudo pro root tambem para facilitar nossa vida
 
-    sudo cp /home/aluno/Desktop/* /root/Desktop/.
+    sudp cp /home/aluno/Desktop/* /root/Desktop/.
     sudo cp /home/aluno/Desktop/* /home/professor/Desktop/.
+
+    return 0;
+
+    if [[ "$USER" != "professor" ]]; then
+        echo "Not logged as 'professor', aborting"
+        return -1;
+    fi
 
     # Customizacao: alunos nao podem alterar a pasta Desktop
 
