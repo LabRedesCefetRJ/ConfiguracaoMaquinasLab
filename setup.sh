@@ -621,6 +621,8 @@ function labredes_customizacao(){
 
                 touch ${install_dir}/.autologin-ok.stamp
                 echo "[`date`] Autologin for Zorin configured" | tee -a ${log}
+
+                sudo reboot
                 ;;
             *)
                 echo "[`date`] ERROR! Unsupported autologin distro!" | tee -a ${log}
