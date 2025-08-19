@@ -641,7 +641,8 @@ function labredes_customizacao(){
     if [[ ! -f ${install_dir}/.autologin.stamp ]]; then
         touch ${install_dir}/.autologin.stamp
         sudo cp -r ${install_dir}/ /home/aluno/ConfiguracaoMaquinasLab/
-        echo "Restarting machine ... continue the procedure from the login 'aluno'"
+
+        echo "Restarting machine in 10 seconds ... continue the procedure from the login 'aluno' and folder '/home/aluno/ConfiguracaoMaquinasLab/' "
         sleep 10
         sudo reboot
     fi
