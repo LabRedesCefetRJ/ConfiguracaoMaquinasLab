@@ -734,8 +734,8 @@ function labredes_customizacao(){
 
         # Customizacao: todos podem escrever e alterar a pasta do servidor web
 
-        sudo chown root:root /var/www/html
-        sudo chmod a=rwx /var/www/html
+        sudo chown root:root /var/www/
+        sudo chmod a=rwx -R /var/www/
 
         touch ${install_dir}/.permissions-aluno.stamp
         echo "[`date`] Permissions for 'aluno' configured" | tee -a ${log}
