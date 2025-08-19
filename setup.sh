@@ -710,30 +710,36 @@ function labredes_customizacao(){
 
     # copiando tudo pro root tambem para facilitar nossa vida
 
-    sudo cp /home/aluno/Desktop/* /root/Desktop/.
-    sudo cp /home/aluno/Desktop/* /home/professor/Desktop/.
+    if [[ ! -f ${install_dir}/.permissions-aluno.stamp ]]; then
 
-    return 0;
+        sudo cp /home/aluno/Desktop/* /root/Desktop/.
+        sudo cp /home/aluno/Desktop/* /home/professor/Desktop/.
 
-    # Customizacao: alunos nao podem alterar a pasta Desktop
+        # Customizacao: alunos nao podem alterar a pasta Desktop
 
-    sudo chown root:root /home/aluno/Desktop
-    sudo chmod a=rx /home/aluno/Desktop
+        sudo chown root:root /home/aluno/Desktop
+        sudo chmod a=rx /home/aluno/Desktop
 
-    # Customizacao: alunos nao podem alterar .profile e .bashrc
+        # Customizacao: alunos nao podem alterar .profile e .bashrc
 
-    sudo chown root:root /home/aluno/.profile
-    sudo chown root:root /home/aluno/.bashrc
-    sudo chown root:root /home/aluno/.bash_logout
+        sudo chown root:root /home/aluno/.profile
+        sudo chown root:root /home/aluno/.bashrc
+        sudo chown root:root /home/aluno/.bash_logout
 
-    sudo chmod a=r /home/aluno/.profile
-    sudo chmod a=r /home/aluno/.bashrc
-    sudo chmod a=r /home/aluno/.bash_logout
+        sudo chmod a=r /home/aluno/.profile
+        sudo chmod a=r /home/aluno/.bashrc
+        sudo chmod a=r /home/aluno/.bash_logout
 
-    # Customizacao: todos podem escrever e alterar a pasta do servidor web
+        # Customizacao: todos podem escrever e alterar a pasta do servidor web
 
-    sudo chown root:root /var/www/html
-    sudo chmod a=rwx /var/www/html
+        sudo chown root:root /var/www/html
+        sudo chmod a=rwx /var/www/html
+
+        touch ${install_dir}/.permissions-aluno.stamp
+        echo "[`date`] Permissions for 'aluno' configured" | tee -a ${log}
+    else
+        echo "[`date`] Permissions for 'aluno' already configured" | tee -a ${log}
+    fi     
 
     return 0
 
