@@ -63,7 +63,7 @@ labredes_customizacao zorin
 O script irá parar uma última vez para solicitar login de usuário com permissão de sudo (_professor_ nesse tutorial)
 
 ```
-cd /opt/ConfiguracoesMaquinasLab
+cd /opt/ConfiguracaoMaquinasLab
 . setup.sh
 labredes_customizacao zorin
 ```
@@ -72,7 +72,7 @@ labredes_customizacao zorin
 
 ```
 su professor
-cd /opt/ConfiguracoesMaquinasLab
+cd /opt/ConfiguracaoMaquinasLab
 . setup.sh
 labredes_customizacao zorin
 ```
