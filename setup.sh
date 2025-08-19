@@ -585,17 +585,30 @@ function labredes_customizacao(){
         sudo adduser --gecos=",,," aluno < senha.txt
         rm senha.txt
 
+        ### Customizacao: colocando 'aluno' no grupo 'dialup' para usar o Arduino ###
+        # Grupos complementares: plugdev (pendive), cdrom, lpadmin (impressoras)
+        sudo usermod -aG dialout,plugdev,cdrom,users,lpadmin aluno         
+
     else
-        echo "Usuario 'aluno' jah adicionado"
+        echo "[`date`] Usuario 'aluno' jah adicionado" | tee -a ${log}
     fi
 
-    ### Customizacao: colocando 'aluno' no grupo 'dialup' para usar o Arduino ###
-    # Grupos complementares: plugdev (pendive), cdrom, lpadmin (impressoras)
-    sudo usermod -aG dialout,plugdev,cdrom,users,lpadmin aluno    
+    ### Customizacao: Senha de root do MySQL ###
+
+    if [[ ! -f ${install_dir}/.mysql-password.stamp ]]; then 
+
+        root_passwd=root # mudar a senha do root aqui se quiser
+        echo "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${root_passwd}'" | sudo mysql    
+
+        touch ${install_dir}/.mysql-password.stamp
+        echo "[`date`] MySQL password configured" | tee -a ${log}
+    else
+        echo "[`date`] MySQL password already configured" | tee -a ${log}
+    fi    
 
     ### Customizacao: autologin ###
 
-    if [[ ! -f ${install_dir}/.autologin-ok.stamp ]]; then 
+    if [[ ! -f ${install_dir}/.autologin.stamp ]]; then 
         case $distro in
             debian)
                 # Supondo utilizacao do ambiente LXDE
@@ -607,7 +620,7 @@ function labredes_customizacao(){
                 sed 's/#autologin-user-timeout=0/autologin-user-timeout=0/g' /etc/lightdm/lightdm.conf | sudo tee /tmp/lightdm.conf
                 sudo mv /tmp/lightdm.conf /etc/lightdm/lightdm.conf
 
-                touch ${install_dir}/.autologin-ok.stamp
+                touch ${install_dir}/.autologin.stamp
                 echo "[`date`] Autologin for Debian configured" | tee -a ${log}
                 ;;
             zorin)
@@ -620,7 +633,7 @@ function labredes_customizacao(){
                 sed 's/#.*AutomaticLogin[[:space:]]*=.*/   AutomaticLogin = aluno/' /etc/gdm3/custom.conf | sudo tee /tmp/custom.conf
                 sudo mv /tmp/custom.conf /etc/gdm3/custom.conf       
 
-                touch ${install_dir}/.autologin-ok.stamp
+                touch ${install_dir}/.autologin.stamp
                 echo "[`date`] Autologin for Zorin configured" | tee -a ${log}
 
                 ;;
@@ -632,14 +645,10 @@ function labredes_customizacao(){
         echo "[`date`] Autologin already configured" | tee -a ${log}
     fi
 
-    ### Customizacao: Senha de root do MySQL ###
+    if [[ ! -f ${install_dir}/.1st-reboot.stamp ]]; then
 
-    root_passwd=root # mudar a senha do root aqui se quiser
+        touch ${install_dir}/.1st-reboot.stamp
 
-    echo "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${root_passwd}'" | sudo mysql
-
-    if [[ ! -f ${install_dir}/.autologin.stamp ]]; then
-        touch ${install_dir}/.autologin.stamp
         sudo cp -r ${install_dir}/ /home/aluno/ConfiguracaoMaquinasLab/
         sudo chown aluno:aluno -R /home/aluno/ConfiguracaoMaquinasLab/
 
@@ -693,6 +702,8 @@ function labredes_customizacao(){
             #sudo chmod 555 $shortcut
 
             gio set $shortcut metadata::trusted true
+
+            chmod a=rx $shortcut
         done
 
         #sudo crontab -u aluno ./crontab.gio
