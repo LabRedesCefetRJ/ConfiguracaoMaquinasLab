@@ -712,11 +712,13 @@ function labredes_customizacao(){
 
     if [[ ! -f ${install_dir}/.wallpaper.stamp ]]; then 
 
-        cd /home/aluno/.local/share/backgrounds
+        cd /home/aluno/.local/share
+
+        [[ ! -d backgrounds ]] && mkdir backgrounds
 
         cp ${install_dir}/wallpapers/cyberpunk1.jpg labredes_wallpaper.jpg
 
-        wallpaper_path="`pwd`/labredes_wallpaper.png" 
+        wallpaper_path="`pwd`/labredes_wallpaper.jpg" 
 
         case $distro in
             debian)
@@ -743,6 +745,7 @@ function labredes_customizacao(){
                 ;;
             zorin)
                 # Zorin 17 usa o Gnome
+                gsettings set org.gnome.desktop.background picture-uri "file://${wallpaper_path}"
                 ;;
 
             *) 
