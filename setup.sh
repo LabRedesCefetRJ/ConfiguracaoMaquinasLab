@@ -642,6 +642,7 @@ function labredes_customizacao(){
         touch ${install_dir}/.autologin.stamp
         cp -r ./ /home/aluno/ConfiguracaoMaquinasLab
         echo "Restarting machine ... continue the procedure from the login 'aluno'"
+        sleep 10
         sudo reboot
     fi
 
