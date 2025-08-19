@@ -565,6 +565,9 @@ function labredes_customizacao(){
 
         zorin)
             echo "Distribution: Zorin"
+
+            version="`lsb_release -r | grep "Release" | grep -o -E '[[:digit:]]+'`"
+            echo "Version: $version"            
         ;;
 
         *)
