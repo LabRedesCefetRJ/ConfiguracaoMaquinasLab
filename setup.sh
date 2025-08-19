@@ -695,7 +695,7 @@ function labredes_customizacao(){
             chmod a=rx $shortcut
         done
 
-        touch ${install_dir}/.autologin.stamp        
+        touch ${install_dir}/.shortcuts.stamp
         echo "[`date`] Shortcuts configured" | tee -a ${log}
 
     else
