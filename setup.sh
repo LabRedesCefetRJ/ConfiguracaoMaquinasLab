@@ -565,6 +565,9 @@ function labredes_customizacao(){
 
         zorin)
             echo "Distribution: Zorin"
+
+            version="`lsb_release -r | grep "Release" | grep -o -E '[[:digit:]]+'`"
+            echo "Version: $version"            
         ;;
 
         *)
@@ -585,19 +588,33 @@ function labredes_customizacao(){
         sudo adduser --gecos=",,," aluno < senha.txt
         rm senha.txt
 
+        ### Customizacao: colocando 'aluno' no grupo 'dialup' para usar o Arduino ###
+        # Grupos complementares: plugdev (pendive), cdrom, lpadmin (impressoras)
+        sudo usermod -aG dialout,plugdev,cdrom,users,lpadmin aluno     
+
+        echo "[`date`] User 'aluno' configured" | tee -a ${log}
     else
-        echo "Usuario 'aluno' jah adicionado"
+        echo "[`date`] User 'aluno' already configured" | tee -a ${log}
     fi
 
-    ### Customizacao: colocando 'aluno' no grupo 'dialup' para usar o Arduino ###
-    # Grupos complementares: plugdev (pendive), cdrom, lpadmin (impressoras)
-    sudo usermod -aG dialout,plugdev,cdrom,users,lpadmin aluno    
+    ### Customizacao: Senha de root do MySQL ###
+
+    if [[ ! -f ${install_dir}/.mysql-password.stamp ]]; then 
+
+        root_passwd=root # mudar a senha do root aqui se quiser
+        echo "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${root_passwd}'" | sudo mysql    
+
+        touch ${install_dir}/.mysql-password.stamp
+        echo "[`date`] MySQL password configured" | tee -a ${log}
+    else
+        echo "[`date`] MySQL password already configured" | tee -a ${log}
+    fi    
 
     ### Customizacao: autologin ###
 
-    if [[ ! -f ${install_dir}/.autologin-ok.stamp ]]; then 
-        case $distro in)
-            debian|zorin)
+    if [[ ! -f ${install_dir}/.autologin.stamp ]]; then 
+        case $distro in
+            debian)
                 # Supondo utilizacao do ambiente LXDE
                 cp /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf-`date +"%Y-%m-%d_%H-%M"`.backup
 
@@ -607,8 +624,22 @@ function labredes_customizacao(){
                 sed 's/#autologin-user-timeout=0/autologin-user-timeout=0/g' /etc/lightdm/lightdm.conf | sudo tee /tmp/lightdm.conf
                 sudo mv /tmp/lightdm.conf /etc/lightdm/lightdm.conf
 
-                touch ${install_dir}/.autologin-ok.stamp
-                echo "[`date`] Autologin configured" | tee -a ${log}
+                touch ${install_dir}/.autologin.stamp
+                echo "[`date`] Autologin for Debian configured" | tee -a ${log}
+                ;;
+            zorin)
+                # Zorin 17 utiliza o Gnome 3 (gdm)
+                cp /etc/gdm3/custom.conf /etc/gdm3/custom.conf-`date +"%Y-%m-%d_%H-%M"`.backup
+
+                sed 's/#.*AutomaticLoginEnable.*/   AutomaticLoginEnable = true/' /etc/gdm3/custom.conf | sudo tee /tmp/custom.conf
+                sudo mv /tmp/custom.conf /etc/gdm3/custom.conf
+
+                sed 's/#.*AutomaticLogin[[:space:]]*=.*/   AutomaticLogin = aluno/' /etc/gdm3/custom.conf | sudo tee /tmp/custom.conf
+                sudo mv /tmp/custom.conf /etc/gdm3/custom.conf       
+
+                touch ${install_dir}/.autologin.stamp
+                echo "[`date`] Autologin for Zorin configured" | tee -a ${log}
+
                 ;;
             *)
                 echo "[`date`] ERROR! Unsupported autologin distro!" | tee -a ${log}
@@ -618,92 +649,197 @@ function labredes_customizacao(){
         echo "[`date`] Autologin already configured" | tee -a ${log}
     fi
 
-    return 0;
+    if [[ ! -f ${install_dir}/.1st-reboot.stamp ]]; then
 
-    ### Customizacao: Senha de root do MySQL ###
+        touch ${install_dir}/.1st-reboot.stamp
 
-    root_passwd=root # mudar a senha do root aqui se quiser
+        sudo cp -r ${install_dir}/ /opt/ConfiguracaoMaquinasLab/
+        sudo chown aluno:aluno -R /opt/ConfiguracaoMaquinasLab/
+        sudo chmod a=rwx -R /opt/ConfiguracaoMaquinasLab/
 
-    echo "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${root_passwd}'" | sudo mysql
+        echo "Restarting machine in 10 seconds ... continue the procedure from login 'aluno' and folder '/opt/ConfiguracaoMaquinasLab/' "
+        sleep 10
+        sudo reboot
+    fi
 
     ### Customizacao: Atalhos para aplicativos na Área de Trabalho e não podem apagar ou salvar coisas nela ###
 
-    if [[ ! -d /home/aluno/Desktop ]]; then 
+    # A partir desta parte, deve-se utilizar o script do proprio login de aluno
 
-        sudo mkdir /home/aluno/Desktop
-        sudo chown aluno:aluno /home/aluno/Desktop
+    if [[ ! -f ${install_dir}/.shortcuts.stamp ]]; then
 
+        if [[ ! -d /home/aluno/Desktop ]]; then 
+
+            sudo mkdir /home/aluno/Desktop
+            sudo chown aluno:aluno /home/aluno/Desktop
+
+        fi
+        
+        cp /usr/share/applications/lxterminal.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/firefox-esr.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/code.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/codeblocks.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/mysql-workbench.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/google-chrome.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/arduino.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/group.chon.ide.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/group.chon.simulide.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/webots.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/logisim.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/cisco-pt821.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
+
+        # compilados e dpkgs ficam no /usr/local/share/applications
+        cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
+
+        for shortcut in $( find /home/aluno/Desktop/ -name \*.desktop ); do        
+
+            gio set $shortcut metadata::trusted true
+
+            chmod a=rx $shortcut
+        done
+
+        ln -s /var/www /home/aluno/Desktop/www
+
+        touch ${install_dir}/.shortcuts.stamp
+        echo "[`date`] Shortcuts configured" | tee -a ${log}
+
+    else
+        echo "[`date`] Shortcuts already configured" | tee -a ${log}
+    fi     
+
+    ### Customizacao: alunos nao podem mudar o papel de parede ###
+
+    if [[ ! -f ${install_dir}/.wallpaper1.stamp ]]; then 
+
+        cd /home/aluno/.local/share
+
+        [[ ! -d backgrounds ]] && mkdir backgrounds
+
+        cd backgrounds
+
+        cp ${install_dir}/wallpapers/cyberpunk1.jpg labredes_wallpaper.jpg
+
+        wallpaper_path="`pwd`/labredes_wallpaper.jpg"
+
+        case $distro in
+            debian)
+                # supondo ambiente grafico LXDE
+                cd /home/aluno/.config/pcmanfm/LXDE
+
+                cp desktop-items-0.conf desktop-items-0.conf-`date +"%Y-%m-%d_%H-%M"`.backup
+
+                sed "s|^wallpaper=.*|wallpaper=${wallpaper_path}|g" desktop-items-0.conf > novo_desktop.conf
+
+                mv novo_desktop.conf desktop-items-0.conf
+                ;;
+
+            zorin)
+                # Zorin 17 usa o Gnome
+
+                cd /home/aluno/.local/share
+
+                [[ ! -d backgrounds ]] && mkdir backgrounds
+
+                cd backgrounds
+
+                cp ${install_dir}/wallpapers/cyberpunk1.jpg labredes_wallpaper.jpg
+
+                wallpaper_path="`pwd`/labredes_wallpaper.jpg"
+
+                # Zorin 17 usa o Gnome
+                gsettings set org.gnome.desktop.background picture-uri "file://${wallpaper_path}"
+                ;;
+
+            *) 
+                echo "[`date`] ERROR! Distribution not supported!" | tee -a ${log}
+        esac
+
+        touch ${install_dir}/.wallpaper1.stamp
+        echo "[`date`] Wallpaper configured" | tee -a ${log}
+    else
+        echo "[`date`] Wallpaper already configured" | tee -a ${log}
+    fi     
+
+
+    if [[ "$USER" != "professor" ]]; then
+        echo "Not logged as 'professor', run the script again with that login to continue"
+        return -1;
     fi
 
-    sudo cp /usr/share/applications/lxterminal.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/firefox-esr.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/code.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/codeblocks.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/mysql-workbench.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/google-chrome.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/arduino.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/group.chon.ide.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/group.chon.simulide.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/webots.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/logisim.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/cisco-pt821.desktop /home/aluno/Desktop/.
-    sudo cp /usr/share/applications/org.wireshark.Wireshark.desktop /home/aluno/Desktop/.
-
-    # compilados e dpkgs ficam no /usr/local/share/applications
-    sudo cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/aluno/Desktop/.
-
-    cd /home/aluno/Desktop/
-
-    ls *.desktop | xargs -I{} sudo chown root:root '{}'
-    ls *.desktop | xargs -I{} sudo chmod 555 '{}'
-
     # copiando tudo pro root tambem para facilitar nossa vida
-    sudo cp /home/aluno/Desktop/* /root/Desktop/.
 
-    # Customizacao: alunos nao podem alterar a pasta Desktop
+    if [[ ! -f ${install_dir}/.permissions-aluno.stamp ]]; then
 
-    sudo chown root:root /home/aluno/Desktop
-    sudo chmod a=rx /home/aluno/Desktop
+        sudo cp /home/aluno/Desktop/* /root/Desktop/.
+        sudo cp /home/aluno/Desktop/* /home/professor/Desktop/.
 
-    # Customizacao: alunos nao podem alterar .profile e .bashrc
+        # Customizacao: alunos nao podem alterar a pasta Desktop
 
-    sudo chown root:root /home/aluno/.profile
-    sudo chown root:root /home/aluno/.bashrc
+        sudo chown root:root /home/aluno/Desktop
+        sudo chmod a=rx /home/aluno/Desktop
 
-    sudo chmod a=r /home/aluno/.profile
-    sudo chmod a=r /home/aluno/.bashrc
+        # Customizacao: alunos nao podem alterar .profile e .bashrc
 
-    # Customizacao: todos podem escrever e alterar a pasta do servidor web
+        sudo chown root:root /home/aluno/.profile
+        sudo chown root:root /home/aluno/.bashrc
+        sudo chown root:root /home/aluno/.bash_logout
 
-    sudo chown root:root /var/www/html
-    sudo chmod a=rwx /var/www/html
+        sudo chmod a=r /home/aluno/.profile
+        sudo chmod a=r /home/aluno/.bashrc
+        sudo chmod a=r /home/aluno/.bash_logout
 
-    # Customizacao: alunos nao podem mudar o papel de parede
+        # Customizacao: todos podem escrever e alterar a pasta do servidor web
 
-    cd /home/aluno/.config/pcmanfm
+        sudo chown root:root /var/www/
+        sudo chmod a=rwx -R /var/www/
 
-    sudo chown root:root LXDE
-    sudo chmod a=rx LXDE
+        # Customizacao: alunos 
+        sudo touch /etc/dconf/db/local.d/00-wallpaper
 
-    cd LXDE
+        touch ${install_dir}/.permissions-aluno.stamp
+        echo "[`date`] Permissions for 'aluno' configured" | tee -a ${log}
+    else
+        echo "[`date`] Permissions for 'aluno' already configured" | tee -a ${log}
+    fi     
 
-    wget https://images3.alphacoders.com/221/221297.png \
-        -O labredes_wallpaper.png
 
-    wallpaper_path="`pwd`/labredes_wallpaper.png"
+    if [[ ! -f ${install_dir}/.wallpaper2.stamp ]]; then
+        # A parte 2 envolve usar sudo
+        
+        case $distro in
+            debian)
+                # supondo ambiente grafico LXDE
+                cd /home/aluno/.config/pcmanfm
 
-    cp desktop-items-0.conf desktop-items-0.conf-`date +"%Y-%m-%d_%H-%M"`.backup
+                sudo chown root:root LXDE
+                sudo chmod a=rx LXDE
 
-    sed "s|^wallpaper=.*|wallpaper=${wallpaper_path}|g" desktop-items-0.conf > novo_desktop.conf
+                sudo LXDE
 
-    mv novo_desktop.conf desktop-items-0.conf
+                sudo chown root:root ./desktop-items-0.conf
+                sudo chmod a=r ./desktop-items-0.conf
 
-    sudo chown root:root ./desktop-items-0.conf
-    sudo chmod a=r ./desktop-items-0.conf
+                sudo cp /etc/xdg/pcmanfm/default/pcmanfm.conf .
+                sudo chown root:root pcmanfm.conf
+                sudo chmod a=r pcmanfm.conf
+                ;;
+            zorin)
+                # Zorin 17 usa o Gnome
+                wallpaper_path="/home/aluno/.local/share/backgrounds/labredes_wallpaper.jpg"
 
-    sudo cp /etc/xdg/pcmanfm/default/pcmanfm.conf .
-    sudo chown root:root pcmanfm.conf
-    sudo chmod a=r pcmanfm.conf
+                sudo chattr +i /home/aluno/.config/dconf/user
+                ;;
+
+            *) 
+                echo "[`date`] ERROR! Distribution not supported!" | tee -a ${log}
+        esac        
+
+        touch ${install_dir}/.wallpaper2.stamp
+        echo "[`date`] Wallpaper configured" | tee -a ${log}
+    else
+        echo "[`date`] Wallpaper already configured" | tee -a ${log}
+    fi 
 
     # Customizacao: adicionando algumas aplicacoes padrao ao sistema
 
