@@ -662,7 +662,7 @@ function labredes_customizacao(){
     # compilados e dpkgs ficam no /usr/local/share/applications
     cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
 
-    cp /home/$USER/Desktop/*.desktop /home/aluno/Desktop/.
+    sudo cp /home/$USER/Desktop/*.desktop /home/aluno/Desktop/.
 
     for shortcut in $( sudo find /home/aluno/Desktop/ -name \*.desktop ); do
 
