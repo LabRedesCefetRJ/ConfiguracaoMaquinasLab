@@ -672,6 +672,8 @@ function labredes_customizacao(){
     for shortcut in $( sudo find /home/aluno/Desktop/ -name \*.desktop ); do
 
         sudo chown aluno:aluno $shortcut
+
+        sudo chmod 555 $shortcut
         
         echo "@reboot gio set $shortcut metadata::trusted true" >> crontab.gio
 
