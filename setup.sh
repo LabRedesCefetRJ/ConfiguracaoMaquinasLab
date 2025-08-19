@@ -649,11 +649,11 @@ function labredes_customizacao(){
 
         touch ${install_dir}/.1st-reboot.stamp
 
-        sudo cp -r ${install_dir}/ /tmp/ConfiguracaoMaquinasLab/
-        sudo chown aluno:aluno -R /tmp/ConfiguracaoMaquinasLab/
-        sudo chmod a=rwx -R /tmp/ConfiguracaoMaquinasLab/
+        sudo cp -r ${install_dir}/ /opt/ConfiguracaoMaquinasLab/
+        sudo chown aluno:aluno -R /opt/ConfiguracaoMaquinasLab/
+        sudo chmod a=rwx -R /opt/ConfiguracaoMaquinasLab/
 
-        echo "Restarting machine in 10 seconds ... continue the procedure from login 'aluno' and folder '/tmp/ConfiguracaoMaquinasLab/' "
+        echo "Restarting machine in 10 seconds ... continue the procedure from login 'aluno' and folder '/opt/ConfiguracaoMaquinasLab/' "
         sleep 10
         sudo reboot
     fi
