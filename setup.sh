@@ -670,7 +670,7 @@ function labredes_customizacao(){
 
         sudo chown aluno:aluno $shortcut
         
-        su - aluno -c gio set $shortcut metadata::trusted true
+        su - aluno -c "gio set $shortcut metadata::trusted true"
 
         sudo chmod 555 $shortcut
 
