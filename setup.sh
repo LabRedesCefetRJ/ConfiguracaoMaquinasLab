@@ -828,7 +828,11 @@ function labredes_customizacao(){
                 # Zorin 17 usa o Gnome
                 wallpaper_path="/home/aluno/.local/share/backgrounds/labredes_wallpaper.jpg"
 
+                sudo chown root:root /home/aluno/.local/share/backgrounds                
+
                 sudo chattr +i /home/aluno/.config/dconf/user
+
+                sudo chmod a=rx /home/aluno/.local/share/backgrounds
                 ;;
 
             *) 
