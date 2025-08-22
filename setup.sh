@@ -244,7 +244,6 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
                         echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro} ${version}!" | tee -a ${log}
                         ;;
                 esac
-
             ubuntu)
                 case $version in
                     24.04)
