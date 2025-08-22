@@ -22,7 +22,6 @@ function labredes_install_apps_Internet(){
             echo "Distribution: Ubuntu"
             version="`lsb_release -r | grep "Release" | grep -o -E '[[:digit:]]+\.[[:digit:]]+'`"
             echo "Version: ${version}"
-            return 0;
             ;;
         debian)
             echo "Distribution: Debian"
