@@ -18,10 +18,15 @@ function labredes_install_apps_Internet(){
     version="$2"
 
     case $distro in
-
+        ubuntu)
+            echo "Distribution: Ubuntu"
+            version="`lsb_release -r | grep "Release" | grep -o -E '[[:digit:]]+\.[[:digit:]]+'`"
+            echo "Version: ${version}"
+            return 0;
+            ;;
         debian)
             echo "Distribution: Debian"
-        ;;
+            ;;
 
         zorin)
             version="`lsb_release -r | grep "Release" | grep -o -E '[[:digit:]]+'`"
@@ -190,6 +195,12 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
         echo "[`date`] Packages from APT already installed" | tee -a ${log}
     fi
 
+    # Colocando o flatpak no ubuntu
+    if [[ "$distro" == "ubuntu" ]]; then 
+        sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+        sudo flatpak update
+    fi 
+
     #######################
     ### MySQL Workbench ###
     #######################
@@ -198,8 +209,9 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
     if [[ ! -f "${install_dir}/.workbench-installed.stamp" ]]; then
 
-        if [[ "$distro" == "debian" ]]; then 
+        case $distro in
 
+            debian)
             # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
 
             echo "\
@@ -210,38 +222,62 @@ deb http://security.debian.org      bookworm-security  main contrib non-free
 deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list
 
 echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
+                ;;
+        
+            zorin)
+                # O Zorin jah possui o MySQL mas nao o Workbench
+                case $version in
+                    17)
+                        # O Zorin 17 eh baseado no Ubuntu 22.04
+                        echo "Installing MySQL workbench for Zorin/$version ..."
 
+                        workbench_deb="mysql-workbench-community_8.0.43-1ubuntu22.04_amd64.deb"
+
+                        if [[ ! -f $workbench_deb ]]; then 
+                            wget "https://cdn.mysql.com//Downloads/MySQLGUITools/$workbench_deb"
+                        fi
+
+                        sudo apt install -y ./mysql-workbench-community_8.0.43-1ubuntu22.04_amd64.deb
+                        sudo apt install -y -f 
+                        ;;
+                    *)
+                        echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro} ${version}!" | tee -a ${log}
+                        ;;
+                esac;
+
+            ubuntu)
+                case $version in
+                    24.04)
+                        echo "Installing MySQL workbench for $distro/$version ..."
+                        workbench_deb="mysql-workbench-community_8.0.43-1ubuntu24.04_amd64.deb"
+
+                        if [[ ! -f $workbench_deb ]]; then 
+                            wget "https://cdn.mysql.com//Downloads/MySQLGUITools/$workbench_deb"
+                        fi
+
+                        sudo apt install -y ./$workbench_deb
+                        sudo apt install -y -f 
+
+                        if [[ $? -eq 0 ]]; then                    
+                            echo "[`date`] Installation of MySQL Workbench for Zorin/${version} finished" | tee -a ${log}
+                            touch "${install_dir}/.workbench-installed.stamp"
+                        else 
+                            echo "[`date`] ERROR installing MySQL Workbench for Zorin ${version}! " | tee -a ${log}
+                        fi
+                        ;;
+                    *)
+                        echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro} ${version}!" | tee -a ${log}
+                        ;;
+                esac;
+        esac;
+
+        which mysql-workbench 2> /dev/null
+        if [[ $? -eq 0 ]]; then                    
+            echo "[`date`] Installation of MySQL Workbench for ${distro} ${version} finished" | tee -a ${log}
+            touch "${install_dir}/.workbench-installed.stamp"
+        else 
+            echo "[`date`] ERROR installing MySQL Workbench for ${distro} ${version}! " | tee -a ${log}
         fi
-
-        # O Zorin jah possui o MySQL mas nao o Workbench
-        if [[ "$distro" == "zorin" ]]; then 
-
-            case $version in
-                17)
-                    echo "Installing MySQL workbench for Zorin/$version ..."
-
-                    workbench_deb="mysql-workbench-community_8.0.43-1ubuntu22.04_amd64.deb"
-
-                    if [[ ! -f $workbench_deb ]]; then 
-                        wget "https://cdn.mysql.com//Downloads/MySQLGUITools/$workbench_deb"
-                    fi
-
-                    sudo apt install -y ./mysql-workbench-community_8.0.43-1ubuntu22.04_amd64.deb
-                    sudo apt install -y -f 
-
-                    if [[ $? -eq 0 ]]; then                    
-                        echo "[`date`] Installation of MySQL Workbench for Zorin/${version} finished" | tee -a ${log}
-                        touch "${install_dir}/.workbench-installed.stamp"
-                    else 
-                        echo "[`date`] ERROR installing MySQL Workbench for Zorin ${version}! " | tee -a ${log}
-                    fi
-                    ;;
-                *)
-                    echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro} ${version}!" | tee -a ${log}
-                    ;;
-            esac;
-        fi
-
     else
         echo "[`date`] MySQL Workbench already installed" | tee -a ${log}
     fi
@@ -356,20 +392,21 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
 
     if [[ ! -f "${install_dir}/.eclipse-installed.stamp" ]]; then
         
-        if [[ "$distro" == "zorin" ]]; then
+        case $distro in
+            zorin|ubuntu)
+                # Zorin has installation on flathub
+                flatpak -y install org.eclipse.Java
 
-            # Zorin has installation on flathub
-            flatpak -y install org.eclipse.Java
-
-            if [[ $? -eq 0 ]]; then
-                echo "[`date`] Installation of Eclipse for Java finished" | tee -a ${log}
-                touch "${install_dir}/.eclipse-installed.stamp"
-            else 
-                echo "[`date`] ERROR installing Eclipse for Java for ${distro}/${version}! " | tee -a ${log}
-            fi
-        else 
-            echo "[`date`] ERROR: can't install Eclipse!" | tee -a ${log}
-        fi
+                if [[ $? -eq 0 ]]; then
+                    echo "[`date`] Installation of Eclipse for Java finished" | tee -a ${log}
+                    touch "${install_dir}/.eclipse-installed.stamp"
+                else 
+                    echo "[`date`] ERROR installing Eclipse for Java for ${distro}/${version}! " | tee -a ${log}
+                fi
+                ;;
+            *)
+                echo "[`date`] ERROR: can't install Eclipse!" | tee -a ${log}
+        esac
     else 
         echo "[`date`] Eclipse already installed" | tee -a ${log}
     fi    
@@ -668,6 +705,11 @@ function labredes_customizacao(){
 
     if [[ ! -f ${install_dir}/.shortcuts.stamp ]]; then
 
+        if [[ "$USER" != "aluno" ]]; then
+            echo "Not logged as 'aluno', run the script again with that login to continue"
+            return -1;
+        fi
+
         if [[ ! -d /home/aluno/Desktop ]]; then 
 
             sudo mkdir /home/aluno/Desktop
@@ -688,6 +730,8 @@ function labredes_customizacao(){
         cp /usr/share/applications/logisim.desktop /home/$USER/Desktop/.
         cp /usr/share/applications/cisco-pt821.desktop /home/$USER/Desktop/.
         cp /usr/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
+        cp /var/lib/flatpak/exports/share/applications/org.eclipse.Java.desktop /home/$USER/Desktop/.
+        cp /var/lib/flatpak/exports/share/applications/com.jetbrains.PyCharm-Community.desktop /home/$USER/Desktop/.
 
         # compilados e dpkgs ficam no /usr/local/share/applications
         cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
@@ -831,6 +875,8 @@ function labredes_customizacao(){
                 sudo chown root:root /home/aluno/.local/share/backgrounds                
 
                 sudo chattr +i /home/aluno/.config/dconf/user
+
+                sudo chattr +i /home/aluno/.local/share/backgrounds
 
                 sudo chmod a=rx /home/aluno/.local/share/backgrounds
                 ;;
