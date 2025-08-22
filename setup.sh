@@ -711,27 +711,31 @@ function labredes_customizacao(){
             sudo chown aluno:aluno /home/aluno/Desktop
 
         fi
+
+        cd /home/$USER/Desktop/ || cd /home/$USER/'Área de Trabalho'/
+
+        desktop="`pwd`"
         
-        cp /usr/share/applications/lxterminal.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/firefox-esr.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/code.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/codeblocks.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/mysql-workbench.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/google-chrome.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/arduino.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/group.chon.ide.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/group.chon.simulide.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/webots.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/logisim.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/cisco-pt821.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
-        cp /var/lib/flatpak/exports/share/applications/org.eclipse.Java.desktop /home/$USER/Desktop/.
-        cp /var/lib/flatpak/exports/share/applications/com.jetbrains.PyCharm-Community.desktop /home/$USER/Desktop/.
+        ln -s /usr/share/applications/lxterminal.desktop
+        ln -s /usr/share/applications/firefox-esr.desktop 
+        ln -s /usr/share/applications/code.desktop 
+        ln -s /usr/share/applications/codeblocks.desktop 
+        ln -s /usr/share/applications/mysql-workbench.desktop
+        ln -s /usr/share/applications/google-chrome.desktop 
+        ln -s /usr/share/applications/arduino.desktop 
+        ln -s /usr/share/applications/group.chon.ide.desktop 
+        ln -s /usr/share/applications/group.chon.simulide.desktop 
+        ln -s /usr/share/applications/webots.desktop 
+        ln -s /usr/share/applications/logisim.desktop 
+        ln -s /usr/share/applications/cisco-pt821.desktop 
+        ln -s /usr/share/applications/org.wireshark.Wireshark.desktop 
+        ln -s /var/lib/flatpak/exports/share/applications/org.eclipse.Java.desktop 
+        ln -s /var/lib/flatpak/exports/share/applications/com.jetbrains.PyCharm-Community.desktop
 
         # compilados e dpkgs ficam no /usr/local/share/applications
         cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
 
-        for shortcut in $( find /home/aluno/Desktop/ -name \*.desktop ); do        
+        for shortcut in $( find "$desktop" -name \*.desktop ); do        
 
             gio set $shortcut metadata::trusted true
 
