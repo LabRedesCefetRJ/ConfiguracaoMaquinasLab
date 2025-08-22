@@ -310,69 +310,71 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
 
     if [[ ! -f "${install_dir}/.pycharm-installed.stamp" ]]; then
         
-        if [[ "$distro" == "zorin" ]]; then
 
-            # Zorin has installation on flathub
-            flatpak -y install PyCharm-Community
-
-            if [[ $? -eq 0 ]]; then
-                echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
-                touch "${install_dir}/.pycharm-installed.stamp"
-            else 
-                echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
-            fi           
-
-        else 
-            # legacy installation
-
-            cd "${install_dir}/DEBS"
-
-            PYCHARM_VERSION="pycharm-community-2025.2.0.1"
-            PYCHARM_TGZ="${PYCHARM_VERSION}.tar.gz"
-
-            if [[ ! -f "${PYCHARM_TGZ}" ]]; then
-                wget "https://download.jetbrains.com/python/${PYCHARM_TGZ}"
-            fi
-
-            if [[ -f "${PYCHARM_TGZ}" ]]; then
-
-                sudo tar xzf pycharm-*.tar.gz -C /opt/
-
-                cd /opt/pycharm-*/bin
-
-                sh pycharm.sh
+        case $distro in
+            zorin|ubuntu)
+                # Zorin e Ubuntu possuem instalacao via Flatpak
+                flatpak -y install PyCharm-Community
 
                 if [[ $? -eq 0 ]]; then
                     echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
                     touch "${install_dir}/.pycharm-installed.stamp"
                 else 
                     echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
-                fi         
-
-            else
-                echo "[`date`] ERROR! Couldn't download PyCharm!" | tee -a ${log}             
-            fi
-
-            if [[ 1 -eq 0 ]]; then 
-                chown -R aluno:aluno ${PYCHARM_VERSION}
-                chmod a+x ${PYCHARM_VERSION}/bin/pycharm.sh
-
-                mv ${PYCHARM_VERSION} /home/aluno/.local/.
-
-                if [[ ! -d /home/aluno/.local ]]; then 
-                    
-                    mkdir /home/aluno/.local
-                    sudo chown aluno:aluno /home/aluno/.local
-                    
                 fi
-                echo "export PATH=\"/home/aluno/.local/${PYCHARM_VERSION}/bin:\${PATH}\"" | sudo tee -a /home/aluno/.profile
+            ;;
 
-                cd /home/aluno/Desktop
+            *)
+                # se tudo mais falhar, usar o metodo antigo
+                cd "${install_dir}/DEBS"
 
-                ln -s /home/aluno/.local/${PYCHARM_VERSION}/bin/pycharm.sh
-            fi
-        fi
+                PYCHARM_VERSION="pycharm-community-2025.2.0.1"
+                PYCHARM_TGZ="${PYCHARM_VERSION}.tar.gz"
 
+                if [[ ! -f "${PYCHARM_TGZ}" ]]; then
+                    wget "https://download.jetbrains.com/python/${PYCHARM_TGZ}"
+                fi
+
+                if [[ -f "${PYCHARM_TGZ}" ]]; then
+
+                    sudo tar xzf pycharm-*.tar.gz -C /opt/
+
+                    cd /opt/pycharm-*/bin
+
+                    sh pycharm.sh
+
+                    if [[ $? -eq 0 ]]; then
+                        echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
+                        touch "${install_dir}/.pycharm-installed.stamp"
+                    else 
+                        echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
+                    fi         
+
+                else
+                    echo "[`date`] ERROR! Couldn't download PyCharm!" | tee -a ${log}             
+                fi
+
+                if [[ 1 -eq 0 ]]; then 
+                    chown -R aluno:aluno ${PYCHARM_VERSION}
+                    chmod a+x ${PYCHARM_VERSION}/bin/pycharm.sh
+
+                    mv ${PYCHARM_VERSION} /home/aluno/.local/.
+
+                    if [[ ! -d /home/aluno/.local ]]; then 
+                        
+                        mkdir /home/aluno/.local
+                        sudo chown aluno:aluno /home/aluno/.local
+                        
+                    fi
+                    echo "export PATH=\"/home/aluno/.local/${PYCHARM_VERSION}/bin:\${PATH}\"" | sudo tee -a /home/aluno/.profile
+
+                    cd /home/aluno/Desktop
+
+                    ln -s /home/aluno/.local/${PYCHARM_VERSION}/bin/pycharm.sh
+                fi     
+            ;;           
+
+        esac
     else 
 
         echo "[`date`] PyCharm already installed" | tee -a ${log}
