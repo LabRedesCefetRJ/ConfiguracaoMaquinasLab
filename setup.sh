@@ -243,7 +243,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
                     *)
                         echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro} ${version}!" | tee -a ${log}
                         ;;
-                esac;
+                esac
 
             ubuntu)
                 case $version in
@@ -268,8 +268,8 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
                     *)
                         echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro} ${version}!" | tee -a ${log}
                         ;;
-                esac;
-        esac;
+                esac
+        esac
 
         which mysql-workbench 2> /dev/null
         if [[ $? -eq 0 ]]; then                    
