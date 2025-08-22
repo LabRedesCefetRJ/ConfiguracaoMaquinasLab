@@ -251,18 +251,11 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
                         workbench_deb="mysql-workbench-community_8.0.43-1ubuntu24.04_amd64.deb"
 
                         if [[ ! -f $workbench_deb ]]; then 
-                            wget "https://cdn.mysql.com//Downloads/MySQLGUITools/$workbench_deb"
+                            wget "https://cdn.mysql.com//Downloads/MySQLGUITools/${workbench_deb}"
                         fi
 
-                        sudo apt install -y ./$workbench_deb
-                        sudo apt install -y -f 
-
-                        if [[ $? -eq 0 ]]; then                    
-                            echo "[`date`] Installation of MySQL Workbench for Zorin/${version} finished" | tee -a ${log}
-                            touch "${install_dir}/.workbench-installed.stamp"
-                        else 
-                            echo "[`date`] ERROR installing MySQL Workbench for Zorin ${version}! " | tee -a ${log}
-                        fi
+                        sudo apt install -y ./${workbench_deb}
+                        sudo apt install -y -f
                         ;;
                     *)
                         echo "[`date`] ERROR couldn't install MySQL Workbench for ${distro} ${version}!" | tee -a ${log}
