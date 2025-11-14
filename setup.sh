@@ -854,10 +854,12 @@ function labredes_customizacao(){
 
                 sudo chown root:root "${base}/LXDE/desktop-items-0.conf"
                 sudo chmod a=r "${base}/LXDE/desktop-items-0.conf"
+                sudo chattr +i "${base}/LXDE/desktop-items-0.conf"
 
                 sudo cp /etc/xdg/pcmanfm/default/pcmanfm.conf "${base}/LXDE/pcmanfm.conf"
                 sudo chown root:root "${base}/LXDE/pcmanfm.conf"
                 sudo chmod a=r "${base}/LXDE/pcmanfm.conf"
+                sudo chattr +i "${base}/LXDE/pcmanfm.conf"
                 ;;
             zorin)
                 # Zorin 17 usa o Gnome
