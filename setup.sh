@@ -809,7 +809,7 @@ function labredes_customizacao(){
     if [[ ! -f ${install_dir}/.permissions-aluno.stamp ]]; then
 
         sudo cp /home/aluno/Desktop/* /root/Desktop/.
-        sudo cp /home/aluno/Desktop/* /home/professor/Desktop/.
+        sudo cp /home/aluno/Desktop/* /home/labredes/Desktop/.
 
         # Customizacao: alunos nao podem alterar a pasta Desktop
 
