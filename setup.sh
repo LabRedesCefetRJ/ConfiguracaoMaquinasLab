@@ -799,8 +799,8 @@ function labredes_customizacao(){
     fi     
 
 
-    if [[ "$USER" != "professor" ]]; then
-        echo "Not logged as 'professor', run the script again with that login to continue"
+    if [[ "$USER" != "labredes" ]]; then
+        echo "Not logged as 'labredes', run the script again with that login to continue"
         return -1;
     fi
 
