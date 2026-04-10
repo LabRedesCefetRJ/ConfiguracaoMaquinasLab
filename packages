@@ -8,7 +8,10 @@ chrony
 code
 codeblocks
 curl
+docker.io
+filezilla
 flatpak
+fritzing
 g++
 gcc
 git
@@ -29,7 +32,5 @@ php
 php-mysql
 python3
 webots
-wireshark
 whois
-filezilla
-fritzing
+wireshark
