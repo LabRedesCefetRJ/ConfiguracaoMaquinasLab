@@ -815,6 +815,10 @@ function labredes_customizacao(){
 
         sudo chown root:root /home/aluno/Desktop
         sudo chmod a=rx /home/aluno/Desktop
+        
+        # Customizacao : ao fazer login, remove qualquer configuração do git no usuario 'aluno'
+        echo "rm -f ~/.git-credentials" | sudo tee -a /home/aluno/.profile
+        echo "rm -f ~/.gitconfig" | sudo tee -a /home/aluno/.profile
 
         # Customizacao: alunos nao podem alterar .profile e .bashrc
 
