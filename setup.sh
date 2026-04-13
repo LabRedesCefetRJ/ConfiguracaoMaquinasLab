@@ -17,6 +17,12 @@ function labredes_install_apps_Internet(){
     distro="$1"
     version="$2"
 
+    distro2="`lsb_release -i | tail -1 | cut -f2 -d':' | xargs`"
+    release="`lsb_release -r | tail -1 | cut -f2 -d':' | xargs`"
+    codename="`lsb_release -c | tail -1 | cut -f2 -d':' | xargs`"
+
+    echo "Installing for $distro2 $release ( $codename )"
+
     case $distro in
         ubuntu)
             echo "Distribution: Ubuntu"
@@ -38,7 +44,7 @@ function labredes_install_apps_Internet(){
             echo "Select between: debian, zorin"
             return -1
         ;;
-    esac    
+    esac
 
     if [[ ! -f packages ]]; then 
 
@@ -185,7 +191,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
         if [[ "$openjdk_pkg" != "" ]]; then 
             apt-get install -q -s -y $openjdk_pkg
-            
+
             if [[ $? -eq 0 ]]; then 
                 echo "$openjdk_pkg" >> $ok_pkgs
             else 
@@ -316,7 +322,31 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
 
     else    
         echo "[`date`] Google Chrome already installed " | tee -a ${log}
-    fi    
+    fi
+
+    ##################
+    ### VirtualBox ###
+    ##################
+
+    if [[ ! -f "${install_dir}/.virtualbox.stamp" ]]; then
+
+        wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
+
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian $codename contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+
+        sudo apt-get -y update
+        sudo apt-get -y install virtualbox
+
+        if [[ $? -eq 0 ]]; then
+            echo "[`date`] Installation of VirtualBox finished" | tee -a ${log}
+            touch "${install_dir}/.virtualbox.stamp"
+        else 
+            echo "[`date`] ERROR installing VirtualBox for ${distro}/${version}! " | tee -a ${log}
+        fi
+
+    else
+        echo "[`date`] VirtualBox already installed " | tee -a ${log}
+    fi
 
     ###############
     ### PyCharm ###
