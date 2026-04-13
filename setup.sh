@@ -153,13 +153,13 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 
     sudo apt update
     if [[ $? -ne 0 ]]; then
-        echo "[`date`] ERROR during apt update!" | tee -a ${log}
+        echo "[`date`] ERROR during apt update after WeBOTS!" | tee -a ${log}
     fi
 
     ################################################
     ### Instalação dos pacotes via repositorios. ###
     ################################################
-
+    
     if [[ ! -f "${install_dir}/.apt-install.stamp"  ]]; then
 
         cd "${install_dir}"
@@ -180,9 +180,23 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
             fi
         done
 
+        # pegando a ultima versao do OpenJDK
+        openjdk_pkg="`apt-cache search openjdk | egrep 'openjdk-[[:digit:]]{2,}-jdk ' | cut -f1 -d ' ' | sort | tail -1`"
+
+        if [[ "$openjdk_pkg" != "" ]]; then 
+            apt-get install -q -s -y $openjdk_pkg
+            
+            if [[ $? -eq 0 ]]; then 
+                echo "$openjdk_pkg" >> $ok_pkgs
+            else 
+                echo "[`date`] ERROR: couldn't find latest OpenJDK APT package!" | tee -a ${log}
+            fi
+        fi
+        
         sudo apt install linux-headers-`uname -r`
         sudo apt-get install -y `cat $ok_pkgs`
 
+        # pegando e instalando a ultima versao do openjdk
         if [[ $? -eq 0 ]]; then
             echo "[`date`] Packages from APT installed" | tee -a ${log}
             touch "${install_dir}/.apt-install.stamp"
