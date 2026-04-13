@@ -94,20 +94,22 @@ function labredes_install_apps_Internet(){
     ### MySQL ###
     #############
 
-    if [[ "$distro" == "debian" ]]; then 
+    if [[ ! -f "${install_dir}/.mysql-repo.stamp" ]]; then 
+
+        cd "${install_dir}/DEBS"
 
         # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
+        wget https://repo.mysql.com//mysql-apt-config_0.8.36-1_all.deb
 
-        echo "\
-deb http://ftp.br.debian.org/debian bookworm          main contrib non-free non-free-firmware 
-deb http://ftp.br.debian.org/debian bookworm-updates  main contrib non-free non-free-firmware 
-deb http://security.debian.org      bookworm-security  main contrib non-free
+        sudo apt install -y ./mysql-apt-config_0.8.36-1_all.deb
 
-deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list
-
-        echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
-
+        echo "[`date`] MySQL repository added" | tee -a ${log}
+        touch "${install_dir}/.mysql-repo.stamp"
+    else 
+        echo "[`date`] MySQL repository already added" | tee -a ${log}
     fi
+
+    cd "${install_dir}"
 
     ##############
     ### ChonOS ###
