@@ -195,8 +195,11 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
             if [[ $? -eq 0 ]]; then 
                 echo "$openjdk_pkg" >> $ok_pkgs
             else 
-                echo "[`date`] ERROR: couldn't find latest OpenJDK APT package!" | tee -a ${log}
+                echo "[`date`] ERROR: package '$openjdk_pkg' for OpenJDK doesn't exist!" | tee -a ${log}
             fi
+
+        else 
+            echo "[`date`] ERROR: couldn't find latest OpenJDK APT package!" | tee -a ${log}            
         fi
         
         sudo apt install linux-headers-`uname -r`
@@ -629,6 +632,10 @@ function labredes_customizacao(){
 
     distro="$1"
     version="$2"
+
+    distro2="`lsb_release -i | tail -1 | cut -f2 -d':' | xargs`"
+    release="`lsb_release -r | tail -1 | cut -f2 -d':' | xargs`"
+    codename="`lsb_release -c | tail -1 | cut -f2 -d':' | xargs`"    
 
     case $distro in
 
