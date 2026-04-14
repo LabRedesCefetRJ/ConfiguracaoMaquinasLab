@@ -342,7 +342,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
     if [[ ! -f "${install_dir}/.pycharm-installed.stamp" ]]; then    
 
         # Zorin has installation on flathub
-        flatpak -y install PyCharm-Community
+        flatpak -y install com.jetbrains.PyCharm-Professional
 
         if [[ $? -eq 0 ]]; then
             echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
