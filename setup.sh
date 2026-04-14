@@ -139,6 +139,32 @@ function labredes_install_apps_Internet(){
         touch "${install_dir}/.vscode-repo.stamp"
     else 
         echo "[`date`] VSCode repository already added" | tee -a ${log}
+    fi
+
+    ##################
+    ### VirtualBox ###
+    ##################
+
+    if [[ ! -f "${install_dir}/.virtualbox.stamp" ]]; then
+
+        wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
+
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian $codename contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+
+        sudo apt-get -y update
+        sudo apt-get -y -q -s install virtualbox
+
+        if [[ $? -eq 0 ]]; then
+            echo "virtualbox-7.2" >> ${install_dir}/packages
+
+            echo "[`date`] Added VirtualBox repository" | tee -a ${log}
+            touch "${install_dir}/.virtualbox.stamp"
+        else 
+            echo "[`date`] ERROR adding VirtualBox repository ${distro}/${version}! " | tee -a ${log}
+        fi
+
+    else
+        echo "[`date`] VirtualBox repository already installed " | tee -a ${log}
     fi    
 
     ##############    
@@ -195,6 +221,7 @@ function labredes_install_apps_Internet(){
             apt-get install -q -s -y $openjdk_pkg
 
             if [[ $? -eq 0 ]]; then 
+                echo "[`date`] OpenJDK package '$openjdk_pkg' added" | tee -a ${log}
                 echo "$openjdk_pkg" >> $ok_pkgs
             else 
                 echo "[`date`] ERROR: package '$openjdk_pkg' for OpenJDK doesn't exist!" | tee -a ${log}
@@ -327,30 +354,6 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
 
     else    
         echo "[`date`] Google Chrome already installed " | tee -a ${log}
-    fi
-
-    ##################
-    ### VirtualBox ###
-    ##################
-
-    if [[ ! -f "${install_dir}/.virtualbox.stamp" ]]; then
-
-        wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
-
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian $codename contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
-
-        sudo apt-get -y update
-        sudo apt-get -y install virtualbox
-
-        if [[ $? -eq 0 ]]; then
-            echo "[`date`] Installation of VirtualBox finished" | tee -a ${log}
-            touch "${install_dir}/.virtualbox.stamp"
-        else 
-            echo "[`date`] ERROR installing VirtualBox for ${distro}/${version}! " | tee -a ${log}
-        fi
-
-    else
-        echo "[`date`] VirtualBox already installed " | tee -a ${log}
     fi
 
     ###############
