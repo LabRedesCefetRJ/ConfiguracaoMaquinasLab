@@ -444,7 +444,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
     if [[ ! -f "${install_dir}/.eclipse-installed.stamp" ]]; then
         
         case $distro in
-            zorin|ubuntu)
+            zorin|ubuntu|debian)
                 # Zorin has installation on flathub
                 flatpak -y install org.eclipse.Java
 
@@ -460,6 +460,31 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
         esac
     else 
         echo "[`date`] Eclipse already installed" | tee -a ${log}
+    fi
+
+    #################
+    ### IntelliJ  ###
+    #################
+
+    if [[ ! -f "${install_dir}/.intellij-installed.stamp" ]]; then
+        
+        case $distro in
+            zorin|ubuntu|debian)
+                # Zorin has installation on flathub
+                flatpak -y install com.jetbrains.IntelliJ-IDEA-Community
+
+                if [[ $? -eq 0 ]]; then
+                    echo "[`date`] Installation of IntelliJ for Java finished" | tee -a ${log}
+                    touch "${install_dir}/.eclipse-installed.stamp"
+                else 
+                    echo "[`date`] ERROR installing INtelliJ for Java for ${distro}/${version}! " | tee -a ${log}
+                fi
+                ;;
+            *)
+                echo "[`date`] ERROR: can't install INtelliJ!" | tee -a ${log}
+        esac
+    else 
+        echo "[`date`] IntelliJ already installed" | tee -a ${log}
     fi    
 
     #####################
@@ -785,8 +810,13 @@ function labredes_customizacao(){
         cp /usr/share/applications/logisim.desktop /home/$USER/Desktop/.
         cp /usr/share/applications/cisco-pt821.desktop /home/$USER/Desktop/.
         cp /usr/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
-        cp /var/lib/flatpak/exports/share/applications/org.eclipse.Java.desktop /home/$USER/Desktop/.
-        cp /var/lib/flatpak/exports/share/applications/com.jetbrains.PyCharm-Community.desktop /home/$USER/Desktop/.
+
+        for fpak in $( ls /var/lib/flatpak/exports/share/applications/ ); do
+            cp $fpak /home/$USER/Desktop/.
+        done
+        
+        #cp /var/lib/flatpak/exports/share/applications/com.jetbrains.PyCharm-Community.desktop /home/$USER/Desktop/.
+        #cp /var/lib/flatpak/exports/share/applications/com.jetbrains.IntelliJ-IDEA-Community.desktop /home/$USER/Desktop/.
 
         # compilados e dpkgs ficam no /usr/local/share/applications
         cp /usr/local/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
