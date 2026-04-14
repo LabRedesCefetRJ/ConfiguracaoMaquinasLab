@@ -247,10 +247,14 @@ function labredes_install_apps_Internet(){
     fi
 
     # Colocando o flatpak no ubuntu
-    if [[ "$distro" == "ubuntu" ]]; then 
-        sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-        sudo flatpak update
-    fi 
+    case $distro in)
+        ubuntu|debian)
+            sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+            sudo flatpak update
+        *)
+            echo "[`date`] No Flatpak update"
+    esac
 
     #######################
     ### MySQL Workbench ###
