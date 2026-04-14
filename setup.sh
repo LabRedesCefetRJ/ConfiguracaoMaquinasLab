@@ -247,7 +247,7 @@ function labredes_install_apps_Internet(){
     fi
 
     # Colocando o flatpak no ubuntu
-    case $distro in)
+    case $distro in
         ubuntu|debian)
             sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
