@@ -231,7 +231,7 @@ function labredes_install_apps_Internet(){
             echo "[`date`] ERROR: couldn't find latest OpenJDK APT package!" | tee -a ${log}            
         fi
         
-        sudo apt install linux-headers-`uname -r`
+        sudo apt install -y linux-headers-`uname -r`
         sudo apt-get install -y `cat $ok_pkgs`
 
         # pegando e instalando a ultima versao do openjdk
