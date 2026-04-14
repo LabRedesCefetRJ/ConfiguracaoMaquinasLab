@@ -17,43 +17,12 @@ function labredes_install_apps_Internet(){
     distro="$1"
     version="$2"
 
-    distro2="`lsb_release -i | tail -1 | cut -f2 -d':' | xargs`"
+    distro="`lsb_release -i | tail -1 | cut -f2 -d':' | xargs`"
     release="`lsb_release -r | tail -1 | cut -f2 -d':' | xargs`"
     codename="`lsb_release -c | tail -1 | cut -f2 -d':' | xargs`"
 
-    echo "Installing for $distro2 $release ( $codename )"
-
-    case $distro in
-        ubuntu)
-            echo "Distribution: Ubuntu"
-            version="`lsb_release -r | grep "Release" | grep -o -E '[[:digit:]]+\.[[:digit:]]+'`"
-            echo "Version: ${version}"
-            ;;
-        debian)
-            echo "Distribution: Debian"
-            ;;
-
-        zorin)
-            version="`lsb_release -r | grep "Release" | grep -o -E '[[:digit:]]+'`"
-            echo "Distribution: Zorin"
-            echo "Version: $version"
-        ;;
-
-        *)
-            echo "Error: distribution not selected!"
-            echo "Select between: debian, zorin"
-            return -1
-        ;;
-    esac
-
-    if [[ ! -f packages ]]; then 
-
-        echo "Error: file packages not found - aborting ";
-
-        return 1;
-
-    fi
-
+    echo "Installing for $distro $release ( $codename )"
+ 
     which sudo
     if [[ $? -ne 0 ]]; then
 
@@ -74,6 +43,8 @@ function labredes_install_apps_Internet(){
         sudo apt-get -y full-upgrade
 
         touch "${install_dir}/.full-upgrade.stamp"
+
+        sudo apt install -y flatpak
 
         clear
 
@@ -185,7 +156,7 @@ function labredes_install_apps_Internet(){
         echo "[`date`] WeBOTS repository already added" | tee -a ${log}
     fi        
 
-    sudo apt update
+    sudo apt -y update
     if [[ $? -ne 0 ]]; then
         echo "[`date`] ERROR during apt update after WeBOTS!" | tee -a ${log}
     fi
@@ -210,7 +181,7 @@ function labredes_install_apps_Internet(){
 
             else 
                 echo "ERROR";
-                echo "Package not installed: $pkg" >> ${log} ;
+                echo "Package cannot installed: $pkg" >> ${log} ;
             fi
         done
 
@@ -248,13 +219,15 @@ function labredes_install_apps_Internet(){
 
     # Colocando o flatpak no ubuntu
     case $distro in
-        ubuntu|debian)
+        Ubuntu|Debian|Zorin)
             sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+            echo "[`date`] Added flathub repository" | tee -a ${log}
 
             sudo flatpak update
         ;;
         *)
-            echo "[`date`] No Flatpak update"
+            echo "[`date`] No Flatpak update" | tee -a ${log}
         ;;
     esac
 
@@ -268,7 +241,7 @@ function labredes_install_apps_Internet(){
 
         case $distro in
 
-            debian)
+            Debian)
             # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
 
             echo "\
@@ -281,7 +254,7 @@ deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" |
 echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
                 ;;
         
-            zorin)
+            Zorin)
                 # O Zorin jah possui o MySQL mas nao o Workbench
                 case $version in
                     17)
@@ -302,7 +275,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
                         ;;
                 esac
                 ;;
-            ubuntu)
+            Ubuntu)
                 case $version in
                     24.04)
                         echo "Installing MySQL workbench for $distro/$version ..."
@@ -366,69 +339,16 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
     ### PyCharm ###
     ###############
 
-    if [[ ! -f "${install_dir}/.pycharm-installed.stamp" ]]; then
-        
-        if [[ "$distro" == "zorin" ]]; then
+    if [[ ! -f "${install_dir}/.pycharm-installed.stamp" ]]; then    
 
-            # Zorin has installation on flathub
-            flatpak -y install PyCharm-Community
+        # Zorin has installation on flathub
+        flatpak -y install PyCharm-Community
 
-            if [[ $? -eq 0 ]]; then
-                echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
-                touch "${install_dir}/.pycharm-installed.stamp"
-            else 
-                echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
-            fi           
-
+        if [[ $? -eq 0 ]]; then
+            echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
+            touch "${install_dir}/.pycharm-installed.stamp"
         else 
-            # legacy installation
-
-            cd "${install_dir}/DEBS"
-
-            PYCHARM_VERSION="pycharm-community-2025.2.0.1"
-            PYCHARM_TGZ="${PYCHARM_VERSION}.tar.gz"
-
-            if [[ ! -f "${PYCHARM_TGZ}" ]]; then
-                wget "https://download.jetbrains.com/python/${PYCHARM_TGZ}"
-            fi
-
-            if [[ -f "${PYCHARM_TGZ}" ]]; then
-
-                sudo tar xzf pycharm-*.tar.gz -C /opt/
-
-                cd /opt/pycharm-*/bin
-
-                sh pycharm.sh
-
-                if [[ $? -eq 0 ]]; then
-                    echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
-                    touch "${install_dir}/.pycharm-installed.stamp"
-                else 
-                    echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
-                fi         
-
-            else
-                echo "[`date`] ERROR! Couldn't download PyCharm!" | tee -a ${log}             
-            fi
-
-            if [[ 1 -eq 0 ]]; then 
-                chown -R aluno:aluno ${PYCHARM_VERSION}
-                chmod a+x ${PYCHARM_VERSION}/bin/pycharm.sh
-
-                mv ${PYCHARM_VERSION} /home/aluno/.local/.
-
-                if [[ ! -d /home/aluno/.local ]]; then 
-                    
-                    mkdir /home/aluno/.local
-                    sudo chown aluno:aluno /home/aluno/.local
-                    
-                fi
-                echo "export PATH=\"/home/aluno/.local/${PYCHARM_VERSION}/bin:\${PATH}\"" | sudo tee -a /home/aluno/.profile
-
-                cd /home/aluno/Desktop
-
-                ln -s /home/aluno/.local/${PYCHARM_VERSION}/bin/pycharm.sh
-            fi
+            echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
         fi
 
     else 
