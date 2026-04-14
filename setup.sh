@@ -589,30 +589,11 @@ function labredes_customizacao(){
     distro="$1"
     version="$2"
 
-    distro2="`lsb_release -i | tail -1 | cut -f2 -d':' | xargs`"
+    distro="`lsb_release -i | tail -1 | cut -f2 -d':' | xargs`"
     release="`lsb_release -r | tail -1 | cut -f2 -d':' | xargs`"
-    codename="`lsb_release -c | tail -1 | cut -f2 -d':' | xargs`"    
+    codename="`lsb_release -c | tail -1 | cut -f2 -d':' | xargs`"  
 
-    case $distro in
-
-        debian)
-            echo "Distribution: Debian"
-
-        ;;
-
-        zorin)
-            echo "Distribution: Zorin"
-
-            version="`lsb_release -r | grep "Release" | grep -o -E '[[:digit:]]+'`"
-            echo "Version: $version"            
-        ;;
-
-        *)
-            echo "Error: distribution not selected!"
-            echo "Select between: debian, zorin"
-            return -1
-        ;;
-    esac
+    echo "[`date`] Customizing for $distro $release ( $codename )" | tee -a ${log}
 
     ### Adicionando usuario 'aluno' ###
     id aluno > /dev/null
@@ -651,7 +632,7 @@ function labredes_customizacao(){
 
     if [[ ! -f ${install_dir}/.autologin.stamp ]]; then 
         case $distro in
-            debian)
+            Debian)
                 # Supondo utilizacao do ambiente LXDE
                 cp /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf-`date +"%Y-%m-%d_%H-%M"`.backup
 
@@ -664,7 +645,7 @@ function labredes_customizacao(){
                 touch ${install_dir}/.autologin.stamp
                 echo "[`date`] Autologin for Debian configured" | tee -a ${log}
                 ;;
-            zorin)
+            Zorin)
                 # Zorin 17 utiliza o Gnome 3 (gdm)
                 cp /etc/gdm3/custom.conf /etc/gdm3/custom.conf-`date +"%Y-%m-%d_%H-%M"`.backup
 
