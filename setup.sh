@@ -242,7 +242,7 @@ function labredes_install_apps_Internet(){
             echo "[`date`] ERROR installing packages from APT! " | tee -a ${log}
         fi
 
-    else 
+    else
         echo "[`date`] Packages from APT already installed" | tee -a ${log}
     fi
 
@@ -276,7 +276,7 @@ deb http://ftp.br.debian.org/debian bookworm          main contrib non-free non-
 deb http://ftp.br.debian.org/debian bookworm-updates  main contrib non-free non-free-firmware 
 deb http://security.debian.org      bookworm-security  main contrib non-free
 
-deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list
+deb http://ftp.br.debian.org/debian bookworm-backports  main contrib non-free" | sudo tee /etc/apt/sources.list.d/bookworm.list
 
 echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sudo tee /etc/apt/sources.list.d/labredes.list
                 ;;
