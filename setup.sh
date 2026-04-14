@@ -397,11 +397,11 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
                     echo "[`date`] Installation of IntelliJ for Java finished" | tee -a ${log}
                     touch "${install_dir}/.eclipse-installed.stamp"
                 else 
-                    echo "[`date`] ERROR installing INtelliJ for Java for ${distro}/${version}! " | tee -a ${log}
+                    echo "[`date`] ERROR installing IntelliJ for Java for ${distro}/${version}! " | tee -a ${log}
                 fi
                 ;;
             *)
-                echo "[`date`] ERROR: can't install INtelliJ!" | tee -a ${log}
+                echo "[`date`] ERROR: can't install IntelliJ!" | tee -a ${log}
         esac
     else 
         echo "[`date`] IntelliJ already installed" | tee -a ${log}
@@ -713,7 +713,7 @@ function labredes_customizacao(){
         cp /usr/share/applications/cisco-pt821.desktop /home/$USER/Desktop/.
         cp /usr/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
 
-        for fpak in $( ls /var/lib/flatpak/exports/share/applications/ ); do
+        for fpak in $( ls /var/lib/flatpak/exports/share/applications/*.desktop ); do
             cp $fpak /home/$USER/Desktop/.
         done
         
