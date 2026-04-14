@@ -364,7 +364,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
     if [[ ! -f "${install_dir}/.eclipse-installed.stamp" ]]; then
         
         case $distro in
-            zorin|ubuntu|debian)
+            Zorin|Ubuntu|Debian)
                 # Zorin has installation on flathub
                 flatpak -y install org.eclipse.Java
 
@@ -389,7 +389,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
     if [[ ! -f "${install_dir}/.intellij-installed.stamp" ]]; then
         
         case $distro in
-            zorin|ubuntu|debian)
+            Zorin|Ubuntu|Debian)
                 # Zorin has installation on flathub
                 flatpak -y install com.jetbrains.IntelliJ-IDEA-Community
 
