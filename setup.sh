@@ -797,17 +797,18 @@ function labredes_customizacao(){
 
         fi
         
+        cp /usr/share/applications/arduino.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/group.chon.ide.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/group.chon.simulide.desktop /home/$USER/Desktop/.        
         cp /usr/share/applications/lxterminal.desktop /home/$USER/Desktop/.
         cp /usr/share/applications/firefox-esr.desktop /home/$USER/Desktop/.
         cp /usr/share/applications/code.desktop /home/$USER/Desktop/.
         cp /usr/share/applications/codeblocks.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/org.fritzing.Fritzing.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/logisim.desktop /home/$USER/Desktop/.
         cp /usr/share/applications/mysql-workbench.desktop /home/$USER/Desktop/.
         cp /usr/share/applications/google-chrome.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/arduino.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/group.chon.ide.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/group.chon.simulide.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/webots.desktop /home/$USER/Desktop/.
-        cp /usr/share/applications/logisim.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/webots.desktop /home/$USER/Desktop/.        
         cp /usr/share/applications/cisco-pt821.desktop /home/$USER/Desktop/.
         cp /usr/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
 
