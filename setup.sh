@@ -152,7 +152,7 @@ function labredes_install_apps_Internet(){
         echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian $codename contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
 
         sudo apt-get -y update
-        sudo apt-get -y -q -s install virtualbox
+        sudo apt-get -y -q -s install virtualbox-7.2
 
         if [[ $? -eq 0 ]]; then
             echo "virtualbox-7.2" >> ${install_dir}/packages
