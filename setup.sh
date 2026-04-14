@@ -754,7 +754,7 @@ function labredes_customizacao(){
         wallpaper_path="`pwd`/labredes_wallpaper.jpg"
 
         case $distro in
-            debian)
+            Debian)
                 # supondo ambiente grafico LXDE
                 cd /home/aluno/.config/pcmanfm/LXDE
 
@@ -765,7 +765,7 @@ function labredes_customizacao(){
                 mv novo_desktop.conf desktop-items-0.conf
                 ;;
 
-            zorin)
+            Zorin)
                 # Zorin 17 usa o Gnome
 
                 cd /home/aluno/.local/share
@@ -810,7 +810,7 @@ function labredes_customizacao(){
         sudo chown root:root /home/aluno/Desktop
         sudo chmod a=rx /home/aluno/Desktop
         
-        # Customizacao : ao fazer login, remove qualquer configuração do git no usuario 'aluno'
+        # Customizacao : ao fazer login, remove qualquer configuração global do git no usuario 'aluno'
         echo "rm -f ~/.git-credentials" | sudo tee -a /home/aluno/.profile
         echo "rm -f ~/.gitconfig" | sudo tee -a /home/aluno/.profile
 
@@ -843,7 +843,7 @@ function labredes_customizacao(){
         # A parte 2 envolve usar sudo
         
         case $distro in
-            debian)
+            Debian)
                 # supondo ambiente grafico LXDE
                 base="/home/aluno/.config/pcmanfm"
 
@@ -859,7 +859,7 @@ function labredes_customizacao(){
                 sudo chmod a=r "${base}/LXDE/pcmanfm.conf"
                 sudo chattr +i "${base}/LXDE/pcmanfm.conf"
                 ;;
-            zorin)
+            Zorin)
                 # Zorin 17 usa o Gnome
                 wallpaper_path="/home/aluno/.local/share/backgrounds/labredes_wallpaper.jpg"
 
