@@ -251,11 +251,11 @@ function labredes_install_apps_Internet(){
         done
 
         # pegando e instalando a ultima versao do openjdk
-        if [[ $flatpaks_ok -eq 0 ]]; then
-            echo "[`date`] Packages from Flatpak installed" | tee -a ${log}
+        if [[ $flatpaks_ok -eq 1 ]]; then
+            echo "[`date`] All packages from Flatpak installed" | tee -a ${log}
             touch "${install_dir}/.flatpak-install.stamp"
         else 
-            echo "[`date`] ERROR installing packagesfrom Flatpak! " | tee -a ${log}
+            echo "[`date`] ERROR installing packages from Flatpak! " | tee -a ${log}
         fi
 
     else
@@ -673,6 +673,7 @@ function labredes_customizacao(){
         cp /usr/share/applications/webots.desktop /home/$USER/Desktop/.        
         cp /usr/share/applications/cisco-pt821.desktop /home/$USER/Desktop/.
         cp /usr/share/applications/org.wireshark.Wireshark.desktop /home/$USER/Desktop/.
+        cp /usr/share/applications/virtualbox.desktop /home/$USER/Desktop/.
 
         for fpak in $( ls /var/lib/flatpak/exports/share/applications/*.desktop ); do
             cp $fpak /home/$USER/Desktop/.
