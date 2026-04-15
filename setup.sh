@@ -217,6 +217,10 @@ function labredes_install_apps_Internet(){
         echo "[`date`] Packages from APT already installed" | tee -a ${log}
     fi
 
+    #######################
+    ### Pacotes ###
+    #######################
+
     # Colocando o flatpak no ubuntu
     case $distro in
         Ubuntu|Debian|Zorin)
@@ -230,6 +234,35 @@ function labredes_install_apps_Internet(){
             echo "[`date`] No Flatpak update" | tee -a ${log}
         ;;
     esac
+
+    if [[ ! -f "${install_dir}/.flatpak-install.stamp"  ]]; then
+
+        flatpaks_ok=1
+
+        for pkg in $( cat packages-flatpak ); do 
+
+            flatpak -y install $pkg
+
+            if [[ $? -ne 0 ]]; then 
+                flatpaks_ok=0
+                echo "[`date`] ERROR: installing $pkg from flatpak" | tee -a ${log}
+            fi
+
+        done
+
+        # pegando e instalando a ultima versao do openjdk
+        if [[ $flatpaks_ok -eq 0 ]]; then
+            echo "[`date`] Packages from Flatpak installed" | tee -a ${log}
+            touch "${install_dir}/.flatpak-install.stamp"
+        else 
+            echo "[`date`] ERROR installing packagesfrom Flatpak! " | tee -a ${log}
+        fi
+
+    else
+        echo "[`date`] Packages from Flatpak already installed" | tee -a ${log}
+    fi
+
+
 
     #######################
     ### MySQL Workbench ###
@@ -334,78 +367,6 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
     else    
         echo "[`date`] Google Chrome already installed " | tee -a ${log}
     fi
-
-    ###############
-    ### PyCharm ###
-    ###############
-
-    if [[ ! -f "${install_dir}/.pycharm-installed.stamp" ]]; then    
-
-        # Zorin has installation on flathub
-        flatpak -y install com.jetbrains.PyCharm-Professional
-
-        if [[ $? -eq 0 ]]; then
-            echo "[`date`] Installation of PyCharm finished" | tee -a ${log}
-            touch "${install_dir}/.pycharm-installed.stamp"
-        else 
-            echo "[`date`] ERROR installing PyCharm for ${distro}/${version}! " | tee -a ${log}
-        fi
-
-    else 
-
-        echo "[`date`] PyCharm already installed" | tee -a ${log}
-
-    fi
-
-    ################
-    ### Eclipse  ###
-    ################
-
-    if [[ ! -f "${install_dir}/.eclipse-installed.stamp" ]]; then
-        
-        case $distro in
-            Zorin|Ubuntu|Debian)
-                # Zorin has installation on flathub
-                flatpak -y install org.eclipse.Java
-
-                if [[ $? -eq 0 ]]; then
-                    echo "[`date`] Installation of Eclipse for Java finished" | tee -a ${log}
-                    touch "${install_dir}/.eclipse-installed.stamp"
-                else 
-                    echo "[`date`] ERROR installing Eclipse for Java for ${distro}/${version}! " | tee -a ${log}
-                fi
-                ;;
-            *)
-                echo "[`date`] ERROR: can't install Eclipse!" | tee -a ${log}
-        esac
-    else 
-        echo "[`date`] Eclipse already installed" | tee -a ${log}
-    fi
-
-    #################
-    ### IntelliJ  ###
-    #################
-
-    if [[ ! -f "${install_dir}/.intellij-installed.stamp" ]]; then
-        
-        case $distro in
-            Zorin|Ubuntu|Debian)
-                # Zorin has installation on flathub
-                flatpak -y install com.jetbrains.IntelliJ-IDEA-Community
-
-                if [[ $? -eq 0 ]]; then
-                    echo "[`date`] Installation of IntelliJ for Java finished" | tee -a ${log}
-                    touch "${install_dir}/.eclipse-installed.stamp"
-                else 
-                    echo "[`date`] ERROR installing IntelliJ for Java for ${distro}/${version}! " | tee -a ${log}
-                fi
-                ;;
-            *)
-                echo "[`date`] ERROR: can't install IntelliJ!" | tee -a ${log}
-        esac
-    else 
-        echo "[`date`] IntelliJ already installed" | tee -a ${log}
-    fi    
 
     #####################
     ### Packet Tracer ###
