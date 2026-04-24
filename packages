@@ -23,7 +23,7 @@ libgomp1
 libopenmpi-dev
 logisim
 make
-mysql-server
+mariadb-server
 mysql-workbench
 net-tools
 okular
