@@ -241,6 +241,8 @@ function labredes_install_apps_Internet(){
 
         for pkg in $( cat packages-flatpak ); do 
 
+            echo "[`date`] Installing $pkg from flatpak" | tee -a ${log}
+
             flatpak -y install $pkg
 
             if [[ $? -ne 0 ]]; then 
@@ -873,7 +875,14 @@ function labredes_customizacao(){
     fi 
 
     # System optimization: usar memoria RAM ao maximo
-    sudo sysctl vm.swappiness=5
+    case distro in
+        Debian|Ubuntu)
+            sudo /usr/sbin/sysctl vm.swappiness=5
+            ;;
+        *)
+            echo "[`date`] ERROR when system optimizing!"
+            ;;
+    esac;
 
     # Customizacao: adicionando algumas aplicacoes padrao ao sistema
 
