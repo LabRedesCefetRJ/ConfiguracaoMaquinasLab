@@ -599,7 +599,14 @@ function labredes_customizacao(){
     if [[ ! -f ${install_dir}/.mysql-password.stamp ]]; then 
 
         root_passwd=root # mudar a senha do root aqui se quiser
-        echo "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${root_passwd}'" | sudo mysql    
+
+        which mariadb > /dev/null
+        if [[ $? -eq 0 ]]; then        
+            echo "ALTER USER 'root'@'localhost' IDENTIFIED BY '${root_passwd}'" | sudo mariadb
+        else 
+            echo "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${root_passwd}'" | sudo mysql
+        fi
+        
 
         touch ${install_dir}/.mysql-password.stamp
         echo "[`date`] MySQL password configured" | tee -a ${log}
@@ -865,7 +872,8 @@ function labredes_customizacao(){
         echo "[`date`] Wallpaper already configured" | tee -a ${log}
     fi 
 
-    # System optimizations
+    # System optimization: usar memoria RAM ao maximo
+    sudo sysctl vm.swappiness=5
 
     # Customizacao: adicionando algumas aplicacoes padrao ao sistema
 
