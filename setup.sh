@@ -201,11 +201,11 @@ function labredes_install_apps_Internet(){
         else 
             echo "[`date`] ERROR: couldn't find latest OpenJDK APT package!" | tee -a ${log}            
         fi
-        
+
+        # Instalando o linux-headers        
         sudo apt install -y linux-headers-`uname -r`
         sudo apt-get install -y `cat $ok_pkgs`
-
-        # pegando e instalando a ultima versao do openjdk
+        
         if [[ $? -eq 0 ]]; then
             echo "[`date`] Packages from APT installed" | tee -a ${log}
             touch "${install_dir}/.apt-install.stamp"
@@ -218,7 +218,7 @@ function labredes_install_apps_Internet(){
     fi
 
     #######################
-    ### Pacotes ###
+    ### Pacotes Flatpak ###
     #######################
 
     # Colocando o flatpak no ubuntu
