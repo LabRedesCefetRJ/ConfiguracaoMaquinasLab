@@ -250,7 +250,6 @@ function labredes_install_apps_Internet(){
 
         done
 
-        # pegando e instalando a ultima versao do openjdk
         if [[ $flatpaks_ok -eq 1 ]]; then
             echo "[`date`] All packages from Flatpak installed" | tee -a ${log}
             touch "${install_dir}/.flatpak-install.stamp"
@@ -367,6 +366,25 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
     else    
         echo "[`date`] Google Chrome already installed " | tee -a ${log}
     fi
+
+
+    ##############
+    ### Snoopy ###
+    ##############
+
+    cd "${install_dir}"
+    
+    mkdir snoopy
+
+    cd snoopy
+
+    curl -L -k https://www-dssz.informatik.tu-cottbus.de/track/download.php?id=259 -o snoopy.tgz
+
+    tar xaf snoopy.tgz
+
+    sudo mv snoopy2 /usr/local/snoopy2
+
+    cd "${install_dir}"
 
     #####################
     ### Packet Tracer ###
@@ -678,6 +696,9 @@ function labredes_customizacao(){
         for fpak in $( ls /var/lib/flatpak/exports/share/applications/*.desktop ); do
             cp $fpak /home/$USER/Desktop/.
         done
+
+        cd /home/$USER/Desktop/
+        ln -s /usr/local/snoopy2 
         
         #cp /var/lib/flatpak/exports/share/applications/com.jetbrains.PyCharm-Community.desktop /home/$USER/Desktop/.
         #cp /var/lib/flatpak/exports/share/applications/com.jetbrains.IntelliJ-IDEA-Community.desktop /home/$USER/Desktop/.
