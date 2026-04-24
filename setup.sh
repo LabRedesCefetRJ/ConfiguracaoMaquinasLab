@@ -382,7 +382,7 @@ echo "deb [trusted=yes] http://bsi.cefet-rj.br/repo/~debian labredes main" | sud
 
     tar xaf snoopy.tgz
 
-    sudo mv snoopy2 /usr/local/snoopy2
+    sudo mv snoopy2 /opt/.
 
     cd "${install_dir}"
 
@@ -698,7 +698,7 @@ function labredes_customizacao(){
         done
 
         cd /home/$USER/Desktop/
-        ln -s /usr/local/snoopy2 
+        ln -s /opt/snoopy2 
         
         #cp /var/lib/flatpak/exports/share/applications/com.jetbrains.PyCharm-Community.desktop /home/$USER/Desktop/.
         #cp /var/lib/flatpak/exports/share/applications/com.jetbrains.IntelliJ-IDEA-Community.desktop /home/$USER/Desktop/.
