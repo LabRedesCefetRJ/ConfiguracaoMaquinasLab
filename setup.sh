@@ -865,6 +865,8 @@ function labredes_customizacao(){
         echo "[`date`] Wallpaper already configured" | tee -a ${log}
     fi 
 
+    # System optimizations
+
     # Customizacao: adicionando algumas aplicacoes padrao ao sistema
 
     echo "application/pdf=org.kde.okular.desktop" | sudo tee -a /usr/share/applications/defaults.list
