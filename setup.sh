@@ -857,7 +857,7 @@ function labredes_customizacao(){
     # System optimization: usar memoria RAM ao maximo
     case $distro in
         Debian|Ubuntu)
-            sudo /usr/sbin/sysctl vm.swappiness=5
+            echo "vm.swappiness=5" | sudo tee -a /etc/sysctl.conf
             ;;
         *)
             echo "[`date`] ERROR when system optimizing!"
