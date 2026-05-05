@@ -61,26 +61,6 @@ function labredes_install_apps_Internet(){
         echo "[`date`] Full upgrade already done" | tee -a ${log}
     fi
 
-    ##############
-    ### MySQL ###
-    #############
-
-    if [[ ! -f "${install_dir}/.mysql-repo.stamp" ]]; then 
-
-        cd "${install_dir}/DEBS"
-
-        # O MySQL e o MSQL Workbench estão no sid mas não no bookworm 
-        wget https://repo.mysql.com//mysql-apt-config_0.8.36-1_all.deb
-
-        sudo apt install -y ./mysql-apt-config_0.8.36-1_all.deb
-
-        echo "[`date`] MySQL repository added" | tee -a ${log}
-        touch "${install_dir}/.mysql-repo.stamp"
-    else 
-        echo "[`date`] MySQL repository already added" | tee -a ${log}
-    fi
-
-    cd "${install_dir}"
 
     ##############
     ### ChonOS ###

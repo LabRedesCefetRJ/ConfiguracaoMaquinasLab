@@ -24,7 +24,6 @@ libopenmpi-dev
 logisim
 make
 mariadb-server
-mysql-workbench
 net-tools
 okular
 php
