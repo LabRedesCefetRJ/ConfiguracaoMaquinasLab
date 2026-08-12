@@ -858,6 +858,10 @@ function labredes_customizacao(){
     case $distro in
         Debian|Ubuntu)
             echo "vm.swappiness=5" | sudo tee -a /etc/sysctl.conf
+            echo "zram" | sudo tee /etc/modules-load.d/zram.conf
+            echo 'ACTION=="add", KERNEL=="zram0", ATTR{initstate}=="0", ATTR{comp_algorithm}="zstd", ATTR{disksize}="4G", TAG+="systemd"' | sudo tee /etc/udev/rules.d/99-zram.rules
+            echo "/dev/zram0 none swap defaults,discard,pri=100,x-systemd.makefs 0 0" | sudo tee -a /etc/fstab
+            echo "tmpfs	/tmp	tmpfs	defaults,size=128M	0	2" | sudo tee -a /etc/fstab
             ;;
         *)
             echo "[`date`] ERROR when system optimizing!"
