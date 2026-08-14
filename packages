@@ -26,6 +26,7 @@ make
 mariadb-server
 net-tools
 okular
+openssh-server
 php
 php-mysql
 python3
