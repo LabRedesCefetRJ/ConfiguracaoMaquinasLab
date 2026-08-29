@@ -852,7 +852,11 @@ function labredes_customizacao(){
         echo "[`date`] Wallpaper configured" | tee -a ${log}
     else
         echo "[`date`] Wallpaper already configured" | tee -a ${log}
-    fi 
+    fi
+    
+    # Creating a public folder
+    sudo mkdir /public
+    sudo chmod a=rwx /public
 
     # System optimization: usar memoria RAM ao maximo
     case $distro in
